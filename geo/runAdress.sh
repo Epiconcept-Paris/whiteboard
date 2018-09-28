@@ -1,2 +1,0 @@
-./buildPushAddress.sh
-ssh sparkrunner
