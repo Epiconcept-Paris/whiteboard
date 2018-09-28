@@ -1,4 +1,4 @@
 todo.json
-server/node_modules/*
-data/*
-.idea/*
+server/node_modules/
+data/
+.idea/
