@@ -561,7 +561,7 @@ div.workspace-switch {
   opacity: 1;
 }
 
-#addWks-form-submit {
+#addWks-form-submit, #addWks-form-cancel {
   margin: auto;
   margin-top: 10px;
   width: 50%;

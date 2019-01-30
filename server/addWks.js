@@ -1,21 +1,22 @@
-const fs = require('fs')
-const model = require('./model')
+const fs = require('fs');
+const model = require('./model');
 
  exports.createWks = function(name,login,psw,url) {
   return new Promise((resolve1,reject1) => {
 
     return new Promise((resolve,reject)=>{
-      let path = '../data/fod/workspaces/' + name
-      console.log(path)
-      if (!fs.exists(path)){
-        fs.mkdir(path ,(err) => {
-          if (err) throw err;
-          console.log('The folder workspace has been saved!');
-          resolve(path)
-        })
-      }else{
-        console.log('file already exist')
-      }
+      let path = '../data/fod/workspaces/' + name;
+      fs.exists(path, (exists) => {
+        if (exists) {
+          console.log('file already exists');
+        } else {
+          fs.mkdir(path ,(err) => {
+            if (err) throw err;
+            console.log('The workspace directory has been saved!');
+            resolve(path);
+          })
+        }
+      });
     }).then((path) => {
       oDatasources = [{
         'login':login
@@ -40,4 +41,4 @@ const model = require('./model')
     if(err) throw err
   })
 
-}
+};
