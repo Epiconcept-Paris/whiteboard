@@ -21,7 +21,7 @@ const fs = require('fs');
         login: login,
         psw: psw,
         url: url,
-        chunk: '50'
+        chunk: '100'
       }];
       const sDataSourcesJSON = JSON.stringify(aDataSource);
       fs.writeFile(path + '/datasources.json', sDataSourcesJSON, (err) => {

@@ -105,6 +105,7 @@ exports.modelRefresh = function(ws){
                       const aField = oDataQueryFirstChunk['metadata']['fields'];
                       const iTotalRows = oDataQueryFirstChunk['total_rows'];
                       table = {
+                        id: oItem.id,
                         name: oItem.name,
                         order: iIndex,
                         visible: true,
@@ -148,7 +149,7 @@ exports.modelRefresh = function(ws){
                     aChunkPromise.push(
                       new Promise((resolveGetDataSetChunk, rejectGetDataSetChunk) => {
                         const datasetApiUrlChunk = `${datasetApiUrl}begin/${iBegin}/range/${chunkSize}`;
-                        console.log('datasetApiUrlChunk: ' + datasetApiUrlChunk);
+                        // console.log('datasetApiUrlChunk: ' + datasetApiUrlChunk);
                         req.get(datasetApiUrlChunk, (error, res, body) => {
                           if (error) {
                             rejectGetDataSetChunk(error);
@@ -186,64 +187,6 @@ exports.modelRefresh = function(ws){
                     resolveGetDataSet(response)
                   });
                 }).catch(console.error);
-                // resolveGetDataSet();
-
-                // // GET request to obtain data
-                // req.get(datasetApiUrl, (error, res, body) => {
-                //     if (error) {
-                //       rejectGetDataSet(error);
-                //     }
-                //     const oDataQuery = JSON.parse(body);
-                //     if(Object.keys(oDataQuery).indexOf('metadata') !== -1 && Object.keys(oDataQuery).indexOf('rowdata') !== -1) {
-                //       const aField = oDataQuery['metadata']['fields'];
-                //       const rows = oDataQuery['rowdata'];
-                //       console.log('no. of rows in ' + oItem.name + ': ' + oDataQuery['total_rows'] + ' size: ' + rows.length);
-                //       const table = {
-                //         name: oItem.name,
-                //         order: iIndex,
-                //         visible: true,
-                //         source: 'varset',
-                //         group: 'Data Queries',
-                //         collapsed: true,
-                //         fields: []
-                //       };
-                //       let index = 0;
-                //       for (let d in aField) {
-                //         if (aField.hasOwnProperty(d)) {
-                //           const field = {
-                //             id: d,
-                //             name: (aField[d]['default_label'] ? aField[d]['default_label'] : d),
-                //             type: 'column',
-                //             dataType: aField[d]['type'],
-                //             formula: '',
-                //             format: null,
-                //             visible: true,
-                //             order: index,
-                //             level: 1,
-                //             table: oItem.id // used in JSON file name
-                //           };
-                //           table.fields.push(field);
-                //           index++;
-                //         }
-                //       }
-                //       const dataJson = JSON.stringify(rows.map(row => {
-                //         let newRow = {};
-                //         for(let d in row) {
-                //           if (row.hasOwnProperty(d)) {
-                //             newRow[(aField[d]['default_label'] ? aField[d]['default_label'] : d)] = row[d];
-                //           }
-                //         }
-                //         return newRow;
-                //       }));
-                //       // var sFileName = oItem.name.replace(/ /g, '_').replace(/\//g, '-')
-                //       fs.writeFile('../data/fod/workspaces/'+ ws + `/dataset/${oItem.id}.json`, dataJson, (err) => {
-                //         if (err) throw err;
-                //         console.log(`The data for ${oItem.name} file has been saved!`);
-                //       });
-                //       model.tables.push(table);
-                //     }
-                //   resolveGetDataSet({body});
-                // });
               } else {
                 console.log(oItem.name, 'ignored');
                 resolveGetDataSet();
