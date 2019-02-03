@@ -1,9 +1,8 @@
 exports.modelRefresh = function(ws){
-  return new Promise(function(resolveModelRefresh,rejectModelRefresh) {
+  return new Promise(function(resolveModelRefresh) {
     const req = require('request')
     ,parser = require('xml2json')
-    ,fs = require('fs')
-    ,rimraf = require('rimraf');
+    ,fs = require('fs');
 
     console.log('Refreshing the model');
     const readDataSources = new Promise((resolveReadDataSources, rejectReadDataSources) => {
@@ -23,6 +22,7 @@ exports.modelRefresh = function(ws){
         const login = aDataSource[0].login.trim();
         const psw = aDataSource[0].psw.trim();
         const url = aDataSource[0].url.replace('http://', '').replace('https://', '').trim();
+        const chunkSize = parseInt(aDataSource[0].chunk.trim(), 10);
         const sAuthUrl = 'http://' + login + ':' + psw + '@' + url;
 
         // get data sets of specified Voo4 application
@@ -80,32 +80,40 @@ exports.modelRefresh = function(ws){
             ]
         };
 
+        // Get request to obtain all dataqueries and exports of the application
         req.get(apiUrl, (error, res, body) => {
           const oResponse = JSON.parse(parser.toJson(body));
           const aDataSet = oResponse.root.response.dataset;
           Promise.all(
-            aDataSet.map((oItem, iIndex) => new Promise(function(resolve, reject) {
-              // var aDataSetId = ['189'];
-              // if (aDataSetId.includes(oItem.id)) {
+            aDataSet.map((oItem, iIndex) => new Promise(function(resolveGetDataSet, rejectGetDataSet) {
+              var aDataSetId = ['185', '187'];
+              if (aDataSetId.includes(oItem.id)) {
                 console.log('fetching data for dataset ' + oItem.id + ' name ' + oItem.name);
+
                 const datasetApiUrl = sAuthUrl + '/ws/dataset/id/' + oItem.id + '/format/json/';
-                req.get(datasetApiUrl, (error, res, body) => {
+                let table = {};
+
+                const getDataSetFirstChunk = new Promise((resolveGetDataSetFirstChunk, rejectGetDataSetFirstChunk) => {
+                  const datasetInfoApiUrl = datasetApiUrl + 'begin/0/range/1';
+                  // GET request to obtain data set information
+                  req.get(datasetInfoApiUrl, (error, res, body) => {
                     if (error) {
-                      reject(error);
+                      rejectGetDataSetFirstChunk(error);
                     }
-                    const oDataQuery = JSON.parse(body);
-                    if(Object.keys(oDataQuery).indexOf('metadata') !== -1 && Object.keys(oDataQuery).indexOf('rowdata') !== -1) {
-                      const aField = oDataQuery['metadata']['fields'];
-                      const rows = oDataQuery['rowdata'];
-                      console.log('no of rows in ' + oItem.name + ': ' + oDataQuery['total_rows'] + ' chunk: ' + rows.length);
-                      const table = {
+                    const oDataQueryFirstChunk = JSON.parse(body);
+                    if( Object.keys(oDataQueryFirstChunk).indexOf('metadata') !== -1 && Object.keys(oDataQueryFirstChunk).indexOf('total_rows') !== -1 ) {
+                      const aField = oDataQueryFirstChunk['metadata']['fields'];
+                      const iTotalRows = oDataQueryFirstChunk['total_rows'];
+                      table = {
                         name: oItem.name,
                         order: iIndex,
                         visible: true,
-                        source: "varset",
-                        group: "Data Queries",
+                        source: 'varset',
+                        group: 'Data Queries',
                         collapsed: true,
-                        fields: []
+                        fields: [],
+                        chunk_size: chunkSize,
+                        total_rows: 0
                       };
                       let index = 0;
                       for (let d in aField) {
@@ -113,49 +121,138 @@ exports.modelRefresh = function(ws){
                           const field = {
                             id: d,
                             name: (aField[d]['default_label'] ? aField[d]['default_label'] : d),
-                            type: "column",
+                            type: 'column',
                             dataType: aField[d]['type'],
-                            formula: "",
+                            formula: '',
                             format: null,
                             visible: true,
                             order: index,
                             level: 1,
-                            table: oItem.name
+                            table: oItem.id // used in JSON file name
                           };
                           table.fields.push(field);
-                          index++;                          
+                          index++;
                         }
                       }
-                      const dataJson = JSON.stringify(rows.map(row => {
-                        let newRow = {};
-                        for(var d in row) {
-                          if (row.hasOwnProperty(d)) {
-                            newRow[(aField[d]['default_label'] ? aField[d]['default_label'] : d)] = row[d];
-                          }
-                        }
-                        return newRow;
-                      }));
-                      // var sFileName = oItem.name.replace(/ /g, '_').replace(/\//g, '-')
-                      fs.writeFile('../data/fod/workspaces/'+ ws + `/dataset/${oItem.name}.json`, dataJson, (err) => {
-                        if (err) throw err;
-                        console.log(`The data for ${oItem.name} file has been saved!`);
-                      });
-                      model.tables.push(table);
+                      // model.tables.push(table);
+                      resolveGetDataSetFirstChunk(iTotalRows);
                     }
-                  if (error) {
-                    return resolve({error});
-                  }
-                  resolve({body});
+                  });
                 });
-              // } else {
-              //   console.log(oItem.name, 'ignored for now');
-              //   resolve();
-              // }
+                
+                getDataSetFirstChunk.then((iTotalRows) => {
+                  const chunks = Math.ceil(iTotalRows / chunkSize);
+                  let aChunkPromise = [];
+                  let iBegin = 0;
+                  for (let i = 0; i < chunks; i++) {
+                    aChunkPromise.push(
+                      new Promise((resolveGetDataSetChunk, rejectGetDataSetChunk) => {
+                        const datasetApiUrlChunk = `${datasetApiUrl}begin/${iBegin}/range/${chunkSize}`;
+                        console.log('datasetApiUrlChunk: ' + datasetApiUrlChunk);
+                        req.get(datasetApiUrlChunk, (error, res, body) => {
+                          if (error) {
+                            rejectGetDataSetChunk(error);
+                          }
+                          const oDataQueryChunk = JSON.parse(body);
+                          if(Object.keys(oDataQueryChunk).indexOf('metadata') !== -1 && Object.keys(oDataQueryChunk).indexOf('rowdata') !== -1) {
+                            const aField = oDataQueryChunk['metadata']['fields'];
+                            const aRowData = oDataQueryChunk['rowdata'];
+                            if (aRowData.length > 0) {
+                              const dataJson = JSON.stringify(aRowData.map(row => {
+                                let newRow = {};
+                                for(let d in row) {
+                                  if (row.hasOwnProperty(d)) {
+                                    newRow[(aField[d]['default_label'] ? aField[d]['default_label'] : d)] = row[d];
+                                  }
+                                }
+                                return newRow;
+                              }));
+                              fs.writeFile('../data/fod/workspaces/'+ ws + `/dataset/${oItem.id}_${i}.json`, dataJson, (err) => {
+                                if (err) throw err;
+                                console.log(`The data for ${oItem.name} no. ${i} file has been saved!`);
+                              });
+                              table.total_rows += aRowData.length;
+                            }
+                          }
+                          resolveGetDataSetChunk();
+                        });
+                      })
+                    );
+                    iBegin += chunkSize;
+                  }
+
+                  Promise.all(aChunkPromise).then(response => {
+                    model.tables.push(table);
+                    resolveGetDataSet(response)
+                  });
+                }).catch(console.error);
+                // resolveGetDataSet();
+
+                // // GET request to obtain data
+                // req.get(datasetApiUrl, (error, res, body) => {
+                //     if (error) {
+                //       rejectGetDataSet(error);
+                //     }
+                //     const oDataQuery = JSON.parse(body);
+                //     if(Object.keys(oDataQuery).indexOf('metadata') !== -1 && Object.keys(oDataQuery).indexOf('rowdata') !== -1) {
+                //       const aField = oDataQuery['metadata']['fields'];
+                //       const rows = oDataQuery['rowdata'];
+                //       console.log('no. of rows in ' + oItem.name + ': ' + oDataQuery['total_rows'] + ' size: ' + rows.length);
+                //       const table = {
+                //         name: oItem.name,
+                //         order: iIndex,
+                //         visible: true,
+                //         source: 'varset',
+                //         group: 'Data Queries',
+                //         collapsed: true,
+                //         fields: []
+                //       };
+                //       let index = 0;
+                //       for (let d in aField) {
+                //         if (aField.hasOwnProperty(d)) {
+                //           const field = {
+                //             id: d,
+                //             name: (aField[d]['default_label'] ? aField[d]['default_label'] : d),
+                //             type: 'column',
+                //             dataType: aField[d]['type'],
+                //             formula: '',
+                //             format: null,
+                //             visible: true,
+                //             order: index,
+                //             level: 1,
+                //             table: oItem.id // used in JSON file name
+                //           };
+                //           table.fields.push(field);
+                //           index++;
+                //         }
+                //       }
+                //       const dataJson = JSON.stringify(rows.map(row => {
+                //         let newRow = {};
+                //         for(let d in row) {
+                //           if (row.hasOwnProperty(d)) {
+                //             newRow[(aField[d]['default_label'] ? aField[d]['default_label'] : d)] = row[d];
+                //           }
+                //         }
+                //         return newRow;
+                //       }));
+                //       // var sFileName = oItem.name.replace(/ /g, '_').replace(/\//g, '-')
+                //       fs.writeFile('../data/fod/workspaces/'+ ws + `/dataset/${oItem.id}.json`, dataJson, (err) => {
+                //         if (err) throw err;
+                //         console.log(`The data for ${oItem.name} file has been saved!`);
+                //       });
+                //       model.tables.push(table);
+                //     }
+                //   resolveGetDataSet({body});
+                // });
+              } else {
+                console.log(oItem.name, 'ignored');
+                resolveGetDataSet();
+              }
             })))
             .then(aResult => {
               aResult.forEach(oItem => {
                 if (oItem && oItem.error) {
-                  console.error(oItem.error)
+                  console.error(oItem.error);
                   return false;
                 }
               });
@@ -164,13 +261,12 @@ exports.modelRefresh = function(ws){
                 if (err) throw err;
                 console.log('The model file has been saved!');
               });
-
-              resolveModelRefresh()
+              resolveModelRefresh();
             })
             .catch(console.error);
         });
       }
     })
-    .catch(console.error)
+    .catch(console.error);
   })
 };

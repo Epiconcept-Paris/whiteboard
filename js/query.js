@@ -34,7 +34,7 @@ var query = function() {
   }
   this.addFields = function(fields) {
     fields.forEach(f => this.addField(f));
-  }
+  };
   // this.addFieldsName = function(fieldsName){
   //   fields.
   // }
@@ -43,11 +43,10 @@ var query = function() {
     return field.table + "[" +field.name + "]";
   }
   this.rawData = function(fields) {
-    return new Promise((resolve,reject)=>{
-    //todo: Implement getting data from json stored files on model
-    const wks = d3.select("span.workspace-name").text()
-    const aData = []
-    let url = ""
+      return new Promise((resolve,reject)=>{
+      //todo: Implement getting data from json stored files on model
+      const wks = d3.select("span.workspace-name").text();
+      let url = "";
       Object.keys(this.fields).forEach((d,i)=>{
         url += '/'+ d
       })
@@ -58,7 +57,7 @@ var query = function() {
 }
   this.data = function() {
     var grouped = {}
-    var raw = this.rawData()
+    var raw = this.rawData();
     //grouping
     return raw.then((d)=>{
       d.forEach(line => {

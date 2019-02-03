@@ -35,24 +35,23 @@ const storage = {
   }
   ,getData: function(url,ws){
 
-    return new Promise((resolve,reject)=>{
-      path = `/workspaces/${ws}${url}/data`; // the missing slash is added in query
-      request = new XMLHttpRequest()
+    return new Promise((resolve,reject)=> {
+      const path = `/workspaces/${ws}${url}/data`; // the missing slash is added in query
+      let request = new XMLHttpRequest();
       request.onreadystatechange = function() {
         if (request.readyState === XMLHttpRequest.DONE) {
           // everything is good, the response is received
           if (request.status === 200) {
-            console.log('row data received')
-            const rowData = JSON.parse(request.responseText)
+            console.log('row data received');
+            const rowData = JSON.parse(request.responseText);
             resolve(rowData)
-
           } else {
 
           }
         } else {
           // still not ready
         }
-      }
+      };
       request.responseType = 'text';
       request.open('GET', path);
       request.send();
