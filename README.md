@@ -1,2 +1,2 @@
-# demy
-Big data platform tailored for public health
+# WhiteBoard
+Data visualisation platform
