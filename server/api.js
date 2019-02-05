@@ -52,17 +52,17 @@ exports.server = () => {
     }
     else if(path.startsWith("/workspaces/") && path.endsWith("/refresh")) {
       path = path.substring("/workspaces/".length);
-      path = path.substring(0, path.length - "/refresh".length)
-      console.log(`${login} is asking for refresh on: ${ path }`)
-        model.modelRefresh(path)
-        .then(()=>{
-          console.log('model created');
-          res.statusCode = 200;
-          return res.end("{}")
-        })
-        .catch((err) => {
-            if (err) throw err;
-        })
+      path = path.substring(0, path.length - "/refresh".length);
+      console.log(`${login} is asking for refresh on: ${ path }`);
+      model.modelRefresh(path)
+      .then(()=>{
+        console.log('model created');
+        res.statusCode = 200;
+        return res.end("{}")
+      })
+      .catch((err) => {
+          if (err) throw err;
+      })
     }
 
     else if(path.startsWith("/workspaces/") && path.endsWith("/addWks")) {
@@ -100,7 +100,7 @@ exports.server = () => {
       path = path.substring(0, path.length - "/visuals".length)
       if(!storage.soundFileName(path))
         return notFound(res);
-      console.log(`${login} is asking for refresh on: ${ path }`)
+      console.log(`${login} is asking for visuals on: ${ path }`)
       workspace.getVisuals(login, path, (err, fd) => {
       if(err) return badRequest(res, err);
       res.statusCode = 200;

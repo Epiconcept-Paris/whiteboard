@@ -13,21 +13,21 @@ const storage = {
   //added by me
   ,getRefresh: function(ws, cb){
     return new Promise((resolve,reject)=> {
-      path = `/workspaces/${ws}/refresh`;
-      request = new XMLHttpRequest()
+      const path = `/workspaces/${ws}/refresh`;
+      let request = new XMLHttpRequest();
       request.onreadystatechange = function() {
 
         if (request.readyState === XMLHttpRequest.DONE) {
           // everything is good, the response is received
           if (request.status === 200) {
             console.log('refresh request completed')
-            resolve()
+            resolve();
           } else {
           }
         } else {
           // still not ready
         }
-      }
+      };
       request.responseType = 'text';
       request.open('GET', path);
       request.send();

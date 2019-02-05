@@ -86,8 +86,8 @@ exports.modelRefresh = function(ws){
           const aDataSet = oResponse.root.response.dataset;
           Promise.all(
             aDataSet.map((oItem, iIndex) => new Promise(function(resolveGetDataSet, rejectGetDataSet) {
-              var aDataSetId = ['185', '187'];
-              if (aDataSetId.includes(oItem.id)) {
+              // var aDataSetId = ['115', '116', '119', '120', '122', '123', '124'];
+              // if (aDataSetId.includes(oItem.id)) {
                 console.log('fetching data for dataset ' + oItem.id + ' name ' + oItem.name);
 
                 const datasetApiUrl = sAuthUrl + '/ws/dataset/id/' + oItem.id + '/format/json/';
@@ -137,60 +137,67 @@ exports.modelRefresh = function(ws){
                       }
                       // model.tables.push(table);
                       resolveGetDataSetFirstChunk(iTotalRows);
+                    } else {
+                      // no metadata available, data query not fetched
+                      resolveGetDataSetFirstChunk(false);
                     }
                   });
                 });
                 
                 getDataSetFirstChunk.then((iTotalRows) => {
-                  const chunks = Math.ceil(iTotalRows / chunkSize);
-                  let aChunkPromise = [];
-                  let iBegin = 0;
-                  for (let i = 0; i < chunks; i++) {
-                    aChunkPromise.push(
-                      new Promise((resolveGetDataSetChunk, rejectGetDataSetChunk) => {
-                        const datasetApiUrlChunk = `${datasetApiUrl}begin/${iBegin}/range/${chunkSize}`;
-                        // console.log('datasetApiUrlChunk: ' + datasetApiUrlChunk);
-                        req.get(datasetApiUrlChunk, (error, res, body) => {
-                          if (error) {
-                            rejectGetDataSetChunk(error);
-                          }
-                          const oDataQueryChunk = JSON.parse(body);
-                          if(Object.keys(oDataQueryChunk).indexOf('metadata') !== -1 && Object.keys(oDataQueryChunk).indexOf('rowdata') !== -1) {
-                            const aField = oDataQueryChunk['metadata']['fields'];
-                            const aRowData = oDataQueryChunk['rowdata'];
-                            if (aRowData.length > 0) {
-                              const dataJson = JSON.stringify(aRowData.map(row => {
-                                let newRow = {};
-                                for(let d in row) {
-                                  if (row.hasOwnProperty(d)) {
-                                    newRow[(aField[d]['default_label'] ? aField[d]['default_label'] : d)] = row[d];
-                                  }
-                                }
-                                return newRow;
-                              }));
-                              fs.writeFile('../data/fod/workspaces/'+ ws + `/dataset/${oItem.id}_${i}.json`, dataJson, (err) => {
-                                if (err) throw err;
-                                console.log(`The data for ${oItem.name} no. ${i} file has been saved!`);
-                              });
-                              table.total_rows += aRowData.length;
+                  if (iTotalRows) {
+                    const chunks = Math.ceil(iTotalRows / chunkSize);
+                    let aChunkPromise = [];
+                    let iBegin = 0;
+                    for (let i = 0; i < chunks; i++) {
+                      aChunkPromise.push(
+                        new Promise((resolveGetDataSetChunk, rejectGetDataSetChunk) => {
+                          const datasetApiUrlChunk = `${datasetApiUrl}begin/${iBegin}/range/${chunkSize}`;
+                          // console.log('datasetApiUrlChunk: ' + datasetApiUrlChunk);
+                          req.get(datasetApiUrlChunk, (error, res, body) => {
+                            if (error) {
+                              rejectGetDataSetChunk(error);
                             }
-                          }
-                          resolveGetDataSetChunk();
-                        });
-                      })
-                    );
-                    iBegin += chunkSize;
-                  }
+                            const oDataQueryChunk = JSON.parse(body);
+                            if(Object.keys(oDataQueryChunk).indexOf('metadata') !== -1 && Object.keys(oDataQueryChunk).indexOf('rowdata') !== -1) {
+                              const aField = oDataQueryChunk['metadata']['fields'];
+                              const aRowData = oDataQueryChunk['rowdata'];
+                              if (aRowData.length > 0) {
+                                const dataJson = JSON.stringify(aRowData.map(row => {
+                                  let newRow = {};
+                                  for(let d in row) {
+                                    if (row.hasOwnProperty(d)) {
+                                      newRow[(aField[d]['default_label'] ? aField[d]['default_label'] : d)] = row[d];
+                                    }
+                                  }
+                                  return newRow;
+                                }));
+                                fs.writeFile('../data/fod/workspaces/'+ ws + `/dataset/${oItem.id}_${i}.json`, dataJson, (err) => {
+                                  if (err) throw err;
+                                  console.log(`The data for ${oItem.name} no. ${i} file has been saved!`);
+                                });
+                                table.total_rows += aRowData.length;
+                              }
+                            }
+                            resolveGetDataSetChunk();
+                          });
+                        })
+                      );
+                      iBegin += chunkSize;
+                    }
 
-                  Promise.all(aChunkPromise).then(response => {
-                    model.tables.push(table);
-                    resolveGetDataSet(response)
-                  });
-                }).catch(console.error);
-              } else {
-                console.log(oItem.name, 'ignored');
-                resolveGetDataSet();
-              }
+                    Promise.all(aChunkPromise).then(response => {
+                      model.tables.push(table);
+                      resolveGetDataSet(response);
+                    });
+                  } else {
+                    resolveGetDataSet();
+                  }
+                }).catch(err => rejectGetDataSet(err));
+              // } else {
+              //   console.log(oItem.name, 'ignored');
+              //   resolveGetDataSet();
+              // }
             })))
             .then(aResult => {
               aResult.forEach(oItem => {
