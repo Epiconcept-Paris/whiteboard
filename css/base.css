@@ -1,14 +1,18 @@
+@font-face {
+  font-family: 'DroidSerifRegular';
+  src: url(font/DroidSerif-Regular-webfont.woff) format('woff');
+}
+
 html {
   height: 100%
 }
 
 body {
-  font-family: "Trebuchet MS", sans-serif;
+  font-family: 'DroidSerifRegular', Arial, sans-serif;
   height: 100%;
   margin: 0;
   font-size: 12px;
-  color: #333333;
-  background: linear-gradient(to bottom, #95C1D6 0%, #CAE0EA 100%)
+  /*background: linear-gradient(to bottom, #95C1D6 0%, #CAE0EA 100%)*/
 }
 
 #console {
@@ -28,18 +32,19 @@ div.main-window {
 
 div.logo {
   margin-left: 20px;
-  font-weight: 600;
-  text-shadow: 1px 4px 6px #abc3cb, 0 0 0 #fff, 1px 4px 6px #abc3cb, 0 0 2px #fff;
+  /*font-weight: 600;*/
+  /*text-shadow: 1px 4px 6px #abc3cb, 0 0 0 #fff, 1px 4px 6px #abc3cb, 0 0 2px #fff;*/
   font-size: 3em;
-  color: hsla(0, 0%, 100%, .6);
-  padding: 3px;
+  /*color: hsla(0, 0%, 100%, .6);*/
+  color: #ffffff;
+  /*padding: 3px;*/
   display: inline-block;
   vertical-align: top;
 }
 
-div.logo:hover {
-  color: #777;
-}
+/*div.logo:hover {*/
+  /*color: #777;*/
+/*}*/
 
 div.actionButtons {
   margin-left: 20px;
@@ -70,10 +75,9 @@ div.actionButton:hover {
   color: gray;
 }
 
-div.epilogo:hover {
-  background-image: url(../img/logo-white.png);
-  background-color: rgba(40, 157, 195, 1);
-}
+/*div.epilogo:hover {*/
+  /*background: rgba(40, 157, 195, 1) url(../img/logo-white.png);*/
+/*}*/
 
 div.property-group-title {
   font-size: 14px;
@@ -82,7 +86,7 @@ div.property-group-title {
 
 div.object-name {
   font-size: 13px;
-  color: #888800
+  /*color: #888800*/
 }
 
 input.object-value {
@@ -101,7 +105,7 @@ div.property-item {
   border-radius: 3px;
   margin-top: 5px;
   padding: 5px;
-  background-color: #CCDDFF;
+  /*background-color: #CCDDFF;*/
 }
 
 span.property-label {
@@ -154,11 +158,9 @@ div.app-list-item:hover {
 }
 
 div.epilogo {
-  height: 50px;
-  width: 50px;
-  background-image: url(../img/logo.png);
-  background-repeat: no-repeat;
-  background-position: center center;
+  height: 60px;
+  width: 150px;
+  background: url(../img/logo-full.png) no-repeat;
   background-size: contain;
   display: inline-block;
 }
@@ -169,17 +171,17 @@ img.switch-icon {
 }
 
 div.reports {
-  background-color: #CCDDFF;
+  /*background-color: #CCDDFF;*/
   border-radius: 5px;
   padding-top: 5px;
   padding-bottom: 5px;
   margin-top: 5px
-
 }
 
 span.reports {
-  color: #888800;
+  /*color: #888800;*/
   margin: 2px;
+  color: #FFC655;
 }
 
 span.report-label {
@@ -189,16 +191,19 @@ span.report-label {
 div.report {
   cursor: grab;
   margin: 2px;
-  padding-left: 4px;
-  padding-top: 1px;
-  padding-bottom: 1px;
+  /*padding-left: 4px;*/
+  /*padding-top: 1px;*/
+  /*padding-bottom: 1px;*/
+  padding: 5px;
+  background-color: #F1F1F1;
 }
 
 div.header {
+  padding: 5px;
   /*  margin: 10px;*/
-  background: linear-gradient(rgba(40, 157, 195, .3), rgba(40, 157, 195, .2)), url(../img/header_grey.png);
+  /*background: linear-gradient(rgba(40, 157, 195, .3), rgba(40, 157, 195, .2)), url(../img/header_grey.png);*/
+  background: #4BCDDB;
   height: 50px;
-
 }
 
 div.content {
@@ -211,7 +216,8 @@ div.left-pane {
   vertical-align: top;
   display: table-cell;
   width: 15%;
-  background-color: #f2f9fc;
+  /*background-color: #f2f9fc;*/
+  background-color: #ffffff;
   padding: 5px;
 }
 
@@ -219,7 +225,8 @@ div.pane-resizer {
   width: 2px;
   display: table-cell;
   cursor: ew-resize;
-  background-color: #337ab7;
+  /*background-color: #337ab7;*/
+  background-color: #4BCDDB;
 }
 
 div.canvas-container {
@@ -232,14 +239,15 @@ div.pane-properties {
   display: table-cell;
   position: relative;
   width: 15%;
-  background-color: #f2f9fc;
+  /*background-color:  #f2f9fc;*/
+  background-color: #ffffff;
   height: 100%
 }
 
 div.fields {
   vertical-align: top;
   /*width: 200px;*/
-  background-color: #CCDDFF;
+  /*background-color: #CCDDFF;*/
   border-radius: 5px;
   margin-top: 5px;
 }
@@ -273,11 +281,13 @@ div.canvas {
 
 div.table {
   margin: 2px;
-  padding-left: 4px;
-  padding-top: 1px;
-  padding-bottom: 1px;
+  /*padding-left: 4px;*/
+  /*padding-top: 1px;*/
+  /*padding-bottom: 1px;*/
+  padding: 5px;
   font-size: 12px;
-  color: #333333;
+  color: #000000;
+  background-color: #F1F1F1;
 }
 
 div.table-group {
@@ -286,14 +296,12 @@ div.table-group {
   padding-top: 2px;
   padding-bottom: 4px;
   font-size: 13px;
-  color: #888800;
+  /*color: #888800;*/
+  color: #FFC655;
 }
 
 div.field {
-  margin-left: 2px;
-  margin-right: 4px;
-  margin-top: 2px;
-  margin-bottom: 2px;
+  margin: 2px 4px 2px 2px;
   padding-left: 4px;
   padding-top: 1px;
   padding-bottom: 1px;

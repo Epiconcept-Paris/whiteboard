@@ -34,7 +34,8 @@ exports.modelRefresh = function(ws){
               {"name":"voozanoo"}
             ]
           ,"groups":[
-            "Varsets", "Data Queries"
+            // "Varsets",
+            "Data Queries"
           ]
           ,"reports":
             [
@@ -44,39 +45,39 @@ exports.modelRefresh = function(ws){
               ,{"name":"Infectious diseases evolution ", "order":1, "visible":true, "source":"myDb", "group":"Reports", "collapsed":"true"}
             ]
           ,"tables":[
-            {"name":"Patient", "order":1, "visible":true, "source":"myDb", "group":"Varsets", "collapsed":"true"
-              ,"fields": [
-                {"name":"IdPatient","type":"column", "dataType":"string", "formula":"IdPatient","format":null, "visible":false, "order":0, "level":1, "table":"Patient"}
-                ,{"name":"Nom","type":"column", "dataType":"string", "formula":"Nom","format":null, "visible":true, "order":1, "level":1, "table":"Patient"}
-                ,{"name":"Prenom","type":"column", "dataType":"string", "formula":"Prenom","format":null, "visible":true, "order":2, "level":1, "table":"Patient"}
-                ,{"name":"Convocation","type":"column", "dataType":"string", "formula":"Convocation","format":null, "visible":true, "order":3, "level":1, "table":"Patient"}
-                ,{"name":"Convocation-code","type":"column", "dataType":"string", "formula":"Convocation-code","format":null, "visible":true, "order":4, "level":2, "table":"Patient"}
-                ,{"name":"Convocation-libellé","type":"column", "dataType":"string", "formula":"Convocation-libellé","format":null, "visible":true, "order":5, "level":2, "table":"Patient"}
-                ,{"name":"Date Naissance","type":"column", "dataType":"date", "formula":"BirthDate","format":null,"visible":true, "order":6, "level":1, "table":"Patient"}
-                ,{"name":"Date Naissance.Année","type":"column", "dataType":"int", "formula":"GetYear(BirthDate)","format":null,"visible":true, "order":7, "level":2, "table":"Patient"}
-                ,{"name":"Date Naissance.Mois","type":"column","dataType":"string","formula":"Format(BirthDate, 'yyyyMMM')","format":null,"visible":true,"order":8,"level":2,"orderby":"Format(Date, 'yyyyMM')","table":"Patient"}
-                ,{"name":"Date Naissance.Jour","type":"column", "dataType":"int", "formula":"GetDay(BirthDate)","format":null,"visible":true, "order":9, "level":2,"table":"Patient"}
-              ]
-            }
-            ,{"name":"Pays", "order":2, "visible":true, "source":"myDb", "group":"Varsets", "collapsed":"true"
-              ,"fields": [
-                {"name":"Code Pays","type":"column", "dataType":"string", "formula":"Code Pays","format":null, "visible":true, "order":1, "level":1, "table":"Pays"}
-                ,{"name":"Pays","type":"column", "dataType":"string", "formula":"Pays","format":null, "visible":true, "order":2, "level":1, "table":"Pays"}
-                ,{"name":"Region","type":"column", "dataType":"string", "formula":"Region","format":null, "visible":true, "order":3, "level":1, "table":"Pays"}
-              ]
-            }
-            ,{"name":"Visite", "order":3, "visible":true, "source":"myDb", "group":"Varsets", "collapsed":"true"
-              ,"fields": [
-                {"name":"IdPatient","type":"column", "dataType":"string", "formula":"IdPatient","format":null, "visible":false, "order":0, "level":1, "table":"Visite"}
-                ,{"name":"Age Patient","type":"column", "dataType":"int","formula":"DateDiff(Date, Now(), 'yyyy')","format":null,"visible":true, "order":1, "level":1, "table":"Visite"}
-                ,{"name":"Date","type":"column", "dataType":"date", "formula":"Date","format":null,"visible":true, "order":2, "level":1, "table":"Visite"}
-                ,{"name":"Date.Année","type":"column", "dataType":"int", "formula":"GetYear(Date)","format":null,"visible":true, "order":3, "level":2, "table":"Visite"}
-                ,{"name":"Date.Mois","type":"column","dataType":"string","formula":"Format(Date, 'yyyyMMM')","format":null,"visible":true,"order":4,"level":2,"orderby":"Format(Date, 'yyyyMM')", "table":"Visite"}
-                ,{"name":"Date.Jour","type":"column", "dataType":"int", "formula":"GetDay(Date)","format":null,"visible":true, "order":4, "level":2, "table":"Visite"}
-                ,{"name":"Code Pays","type":"column", "dataType":"string", "formula":"Code Pays","format":null, "visible":false, "order":5, "level":1, "table":"Visite"}
-                ,{"name":"Code Postale","type":"column", "dataType":"string", "formula":"Code Postale","format":null, "visible":true, "order":6, "level":1, "table":"Visite"}
-              ]
-            }
+            // {"name":"Patient", "order":1, "visible":true, "source":"myDb", "group":"Varsets", "collapsed":"true"
+            //   ,"fields": [
+            //     {"name":"IdPatient","type":"column", "dataType":"string", "formula":"IdPatient","format":null, "visible":false, "order":0, "level":1, "table":"Patient"}
+            //     ,{"name":"Nom","type":"column", "dataType":"string", "formula":"Nom","format":null, "visible":true, "order":1, "level":1, "table":"Patient"}
+            //     ,{"name":"Prenom","type":"column", "dataType":"string", "formula":"Prenom","format":null, "visible":true, "order":2, "level":1, "table":"Patient"}
+            //     ,{"name":"Convocation","type":"column", "dataType":"string", "formula":"Convocation","format":null, "visible":true, "order":3, "level":1, "table":"Patient"}
+            //     ,{"name":"Convocation-code","type":"column", "dataType":"string", "formula":"Convocation-code","format":null, "visible":true, "order":4, "level":2, "table":"Patient"}
+            //     ,{"name":"Convocation-libellé","type":"column", "dataType":"string", "formula":"Convocation-libellé","format":null, "visible":true, "order":5, "level":2, "table":"Patient"}
+            //     ,{"name":"Date Naissance","type":"column", "dataType":"date", "formula":"BirthDate","format":null,"visible":true, "order":6, "level":1, "table":"Patient"}
+            //     ,{"name":"Date Naissance.Année","type":"column", "dataType":"int", "formula":"GetYear(BirthDate)","format":null,"visible":true, "order":7, "level":2, "table":"Patient"}
+            //     ,{"name":"Date Naissance.Mois","type":"column","dataType":"string","formula":"Format(BirthDate, 'yyyyMMM')","format":null,"visible":true,"order":8,"level":2,"orderby":"Format(Date, 'yyyyMM')","table":"Patient"}
+            //     ,{"name":"Date Naissance.Jour","type":"column", "dataType":"int", "formula":"GetDay(BirthDate)","format":null,"visible":true, "order":9, "level":2,"table":"Patient"}
+            //   ]
+            // }
+            // ,{"name":"Pays", "order":2, "visible":true, "source":"myDb", "group":"Varsets", "collapsed":"true"
+            //   ,"fields": [
+            //     {"name":"Code Pays","type":"column", "dataType":"string", "formula":"Code Pays","format":null, "visible":true, "order":1, "level":1, "table":"Pays"}
+            //     ,{"name":"Pays","type":"column", "dataType":"string", "formula":"Pays","format":null, "visible":true, "order":2, "level":1, "table":"Pays"}
+            //     ,{"name":"Region","type":"column", "dataType":"string", "formula":"Region","format":null, "visible":true, "order":3, "level":1, "table":"Pays"}
+            //   ]
+            // }
+            // ,{"name":"Visite", "order":3, "visible":true, "source":"myDb", "group":"Varsets", "collapsed":"true"
+            //   ,"fields": [
+            //     {"name":"IdPatient","type":"column", "dataType":"string", "formula":"IdPatient","format":null, "visible":false, "order":0, "level":1, "table":"Visite"}
+            //     ,{"name":"Age Patient","type":"column", "dataType":"int","formula":"DateDiff(Date, Now(), 'yyyy')","format":null,"visible":true, "order":1, "level":1, "table":"Visite"}
+            //     ,{"name":"Date","type":"column", "dataType":"date", "formula":"Date","format":null,"visible":true, "order":2, "level":1, "table":"Visite"}
+            //     ,{"name":"Date.Année","type":"column", "dataType":"int", "formula":"GetYear(Date)","format":null,"visible":true, "order":3, "level":2, "table":"Visite"}
+            //     ,{"name":"Date.Mois","type":"column","dataType":"string","formula":"Format(Date, 'yyyyMMM')","format":null,"visible":true,"order":4,"level":2,"orderby":"Format(Date, 'yyyyMM')", "table":"Visite"}
+            //     ,{"name":"Date.Jour","type":"column", "dataType":"int", "formula":"GetDay(Date)","format":null,"visible":true, "order":4, "level":2, "table":"Visite"}
+            //     ,{"name":"Code Pays","type":"column", "dataType":"string", "formula":"Code Pays","format":null, "visible":false, "order":5, "level":1, "table":"Visite"}
+            //     ,{"name":"Code Postale","type":"column", "dataType":"string", "formula":"Code Postale","format":null, "visible":true, "order":6, "level":1, "table":"Visite"}
+            //   ]
+            // }
             ]
         };
 

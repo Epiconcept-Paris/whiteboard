@@ -81,6 +81,14 @@ var visualGallery = [
       {"name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
       {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
+  },
+  {
+    "name": "Sample", "icon": "icons/lines.png", "alt": "Sample",
+    "fields": [
+      {"name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+      {"name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+    ]
   }
 ];
 

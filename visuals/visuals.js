@@ -5,6 +5,7 @@ vRender["Scatter"] = {};
 vRender["Filter"] = {};
 vRender["Table"] = {};
 vRender["Lines"] = {};
+vRender["Sample"] = {};
 
 vRender["Scatter"].render = function(svg, data) {
   if (d3.select('svg').select("g.scatterPlot").empty()){
@@ -321,8 +322,8 @@ var y = d3.scaleLinear()
 
 var valueline = d3.line()
     .x(function(d, i) { return x(i); })
-    .y(function(d) { return y(d); })
-    .curve(d3.curveCatmullRom.alpha(0.5));
+    .y(function(d) { return y(d); });
+    // .curve(d3.curveCatmullRom.alpha(0.5));
 
 //////////// PATH ////////////
 var pathUpd =  lineVis.selectAll("path.v-line-line").data(graphData)
@@ -504,8 +505,8 @@ var line_yAxis = line_yAxisUpd.merge(line_yAxisEnt)
 
 
 function NbTicksX(data, width){
-    var valMax = d3.format(".2s")(d3.max(data,function(d,i) { return i}));
-    var valMin = d3.format(".2s")(d3.min(data,function(d,i) {return i}));
+    var valMax = d3.format(".2s")(d3.max(data,function(d,i) { return i }));
+    var valMin = d3.format(".2s")(d3.min(data,function(d,i) { return i }));
     var lengthValMax = valMax.toString().length;
     var lengthValMin = valMin.toString().length;
     var lengthMax;
@@ -606,4 +607,124 @@ vRender["Table"].render = function(svg, data) {
   const aCell = uCell.merge(eCell)
                  .attr("xlink:href", (d, i) => "#colpos"+i)
                  .text(d => d);
+}
+
+/////////////////////Sample chart////////////////////////////
+vRender["Sample"].render = function(svg, data, properties){
+
+  if (d3.select('svg').select("g.sampleChart").empty()){
+    svg.html("");
+  }
+
+  data = [
+      {mois: 'jan', nombre: 875, centre: 'B'},
+      {mois: 'fév', nombre: 1020, centre: 'B'},
+      {mois: 'mar', nombre: 1035, centre: 'C'},
+      {mois: 'avr', nombre: 1005, centre: 'B'},
+      {mois: 'mai', nombre: 1075, centre: 'A'},
+      {mois: 'jun', nombre: 1200, centre: 'B'},
+      {mois: 'jui', nombre: 1100, centre: 'B'},
+      {mois: 'aou', nombre: 1036, centre: 'C'},
+      {mois: 'sept', nombre: 1004, centre: 'B'},
+      {mois: 'oct', nombre: 1656, centre: 'A'},
+      {mois: 'nov', nombre: 1150, centre: 'A'},
+      {mois: 'déc', nombre: 1090, centre: 'A'}
+  ];
+
+  var sXField = 'mois';
+  var sYField = 'nombre';
+
+  var margin = {top: 10, right: 10, bottom: 40, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+  var x = d3.scalePoint().range([0, width]);
+  x.domain(data.map(function(d) { return d[sXField]; }));
+
+  var y = d3.scaleLinear().rangeRound([height, 0]);
+  var minY = d3.min(data, function(d) { return d[sYField]; });
+  var maxY = d3.max(data, function(d) { return d[sYField]; });
+  y.domain([minY, maxY]).nice();
+
+  // add margins
+  var chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // add x-axis
+  chart.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  // add the X grid lines
+  chart.append("g")
+    .attr("class", "grid")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
+
+  // add the Y grid lines
+  chart.append("g")
+    .attr("class", "grid")
+    .call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
+
+  // add y-axis
+  chart.append("g")
+    .attr("class", "axis axis--y")
+    .call(d3.axisLeft(y));
+
+  // define line
+  var line = d3.line()
+    .x(function(d) { return x(d[sXField]); })
+    .y(function(d) { return y(d[sYField]); });
+
+  // declare tooltip div
+  var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  /**
+   * generate line chart
+   */
+  // add line
+  chart.append("path")
+    .attr("class", "line")
+    .attr("fill", "none")
+    .attr("stroke-width", "3px")
+    .attr("d", line(data));
+
+  // add dots and tooltip on hover
+  chart.selectAll("circle")
+    .data(data)
+    .enter().append("circle")
+    .attr("class", "circle")
+    .attr("cx", function(d) { return x(d[sXField]) ; })
+    .attr("cy", function(d) { return y(d[sYField]) ; })
+    .attr("r", 4)
+    .on("mouseover", function (d) {
+      tooltip.transition()
+        .duration(400)
+        .style("opacity", .9);
+      tooltip.html("<span>" + d[sXField]
+        + "<br>"
+        + sYField + ": " + d[sYField]
+        + "</span>")
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 40) + "px");
+    })
+    .on("mouseout", function(d) {
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", 0);
+    });
+
+  chart.selectAll(".line").attr("stroke", "#000000");
+
+  // add animation to line(s)
+  var totalLength = d3.select(".line").node().getTotalLength();
+  chart.selectAll(".line")
+    .attr("stroke-dasharray", totalLength + " " + totalLength)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+    .duration(1500)
+    .ease(d3.easeLinear)
+    .attr("stroke-dashoffset", 0);
 }
