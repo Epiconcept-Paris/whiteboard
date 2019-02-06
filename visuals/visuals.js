@@ -657,13 +657,13 @@ vRender["Sample"].render = function(svg, data, properties){
 
   // add the X grid lines
   chart.append("g")
-    .attr("class", "grid")
+    .attr("class", "grid-line")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x).tickSize(-height).tickFormat(""));
 
   // add the Y grid lines
   chart.append("g")
-    .attr("class", "grid")
+    .attr("class", "grid-line")
     .call(d3.axisLeft(y).tickSize(-width).tickFormat(""));
 
   // add y-axis
@@ -716,7 +716,8 @@ vRender["Sample"].render = function(svg, data, properties){
         .style("opacity", 0);
     });
 
-  chart.selectAll(".line").attr("stroke", "#000000");
+  chart.selectAll(".line").attr("stroke", "#4BCDDB");
+  chart.selectAll("circle").attr("fill", "#4BCDDB");
 
   // add animation to line(s)
   var totalLength = d3.select(".line").node().getTotalLength();

@@ -574,3 +574,21 @@ div.workspace-switch {
   margin-top: 10px;
   width: 50%;
 }
+
+.grid-line line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.tooltip {
+  position: absolute;
+  width: auto;
+  height: auto;
+  background: #000000;
+  border: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  color: #ffffff;
+  padding: 5px;
+}
