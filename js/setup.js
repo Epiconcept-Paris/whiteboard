@@ -39,20 +39,22 @@ window.onload = function () {
 //add Be me
 function addWks() {
 
-  hidePage = d3.select('body').append('div').classed('addWks-hidePage', true)
+  var hidePage = d3.select('body').append('div').classed('addWks-hidePage', true);
 
-  div = hidePage.append('div').classed('addWks-div', true)
-  title = div.append('p').classed("addWks-title", true).text('Add a new Workspace')
-  form = div.append('form').classed('addWks-form', true)//.attr('method','POST').attr('action','/workspaces/'+ workspaceName +'/addWks')
-  form.append('label').attr('for', 'name').text('workspace name')
-  form.append('input').attr('type', 'text').attr('name', 'name').attr('id', 'wksName')
-  form.append('label').attr('for', 'login').text('Login')
-  form.append('input').attr('type', 'text').attr('name', 'login').attr('id', 'wksUser')
-  form.append('label').attr('for', 'psw').text('Password')
-  form.append('input').attr('type', 'password').attr('name', 'psw').attr('id', 'wksPasswd')
-  form.append('label').attr('for', 'url').text('VooZanoo URL')
-  form.append('input').attr('type', 'url').attr('name', 'url').attr('id', 'wksUrl')
-  form.append('input').attr('type', "button").attr('id', 'addWks-form-submit')
+  var div = hidePage.append('div').classed('addWks-div', true);
+  div.append('p').classed("addWks-title", true).text('Add a new workspace');
+
+  var form = div.append('form').classed('addWks-form', true);//.attr('method','POST').attr('action','/workspaces/'+ workspaceName +'/addWks')
+  form.append('label').attr('for', 'name').text('Name');
+  form.append('input').attr('type', 'text').attr('name', 'name').attr('id', 'wksName');
+  form.append('label').attr('for', 'login').text('Username');
+  form.append('input').attr('type', 'text').attr('name', 'login').attr('id', 'wksUser');
+  form.append('label').attr('for', 'psw').text('Password');
+  form.append('input').attr('type', 'password').attr('name', 'psw').attr('id', 'wksPasswd');
+  form.append('label').attr('for', 'url').text('Voozanoo4 URL');
+  form.append('input').attr('type', 'url').attr('name', 'url').attr('id', 'wksUrl');
+  form.append('input').attr('type', "button").attr('id', 'addWks-form-submit').attr('value', 'Connect');
+  form.append('input').attr('type', "button").attr('id', 'addWks-form-cancel').attr('value', 'Cancel');
 
   d3.select("#addWks-form-submit").on("click", (d) => {
     storage.addWorkspace(
@@ -64,18 +66,24 @@ function addWks() {
         workspaceName = d3.select("#wksName").property("value");
         d3.select('div.addWks-hidePage').remove()
         refresh();
-
       })
-  })
+  });
+
+  d3.select("#addWks-form-cancel").on("click", (d) => {
+    d3.select("#wksName").attr("value", null);
+    d3.select("#wksUser").attr("value", null);
+    d3.select("#wksPasswd").attr("value", null);
+    d3.select("#wksUrl").attr("value", null);
+    d3.select('div.addWks-hidePage').remove();
+  });
 }
 
 function refresh() {
-  appendHide()
+  appendHide();
   storage.getRefresh(workspaceName).then(() => {
-    changeWorkspace(workspaceName)
-    d3.select('div.hidePage').remove()
-  }).catch(console.error)
-
+    changeWorkspace(workspaceName);
+    d3.select('div.hidePage').remove();
+  }).catch(console.error);
 }
 
 function appendHide() {
@@ -263,7 +271,9 @@ function applyWorkspace(data) {
 
 function setupGrid() {
   var cells = [];
-  for(var i=0;i<cellCount;i++) {cells.push(i); }
+  for (var i = 0; i < cellCount; i++) {
+    cells.push(i);
+  }
 
   // var grid = document.getElementById("grid");
   // var context = grid.getContext("2d");
@@ -888,10 +898,10 @@ function getResizers(width, height) {
 
 function setResize(d) {
   var dir = d.direction.replace("-resize", "");
-  resizeUp = (dir.indexOf("n")>-1);
-  resizeDown = (dir.indexOf("s")>-1);
-  resizeLeft = (dir.indexOf("w")>-1);
-  resizeRight = (dir.indexOf("e")>-1);
+  resizeUp = (dir.indexOf("n") > -1);
+  resizeDown = (dir.indexOf("s") > -1);
+  resizeLeft = (dir.indexOf("w") > -1);
+  resizeRight = (dir.indexOf("e") > -1);
 }
 
 /**
@@ -941,9 +951,9 @@ function showOptionsAt(visualIndex) {
           options.datum().mouseover = true;
         }
       )
-      .on("mouseout", function () {
-        options.datum().mouseover = false;
-      })
+        .on("mouseout", function () {
+          options.datum().mouseover = false;
+        })
 
     });
 

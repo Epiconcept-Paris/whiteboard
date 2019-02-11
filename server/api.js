@@ -7,7 +7,7 @@ var http = require('http')
     ,workspace = require('./workspace')
     ,model = require('./model')
     ,addWks = require('./addWks')
-    ,sendData = require('./sendData')
+    ,sendData = require('./sendData');
 exports.server = () => {
   return http.createServer((req, res) => {
     var login = conf.user.login;
@@ -52,47 +52,47 @@ exports.server = () => {
     }
     else if(path.startsWith("/workspaces/") && path.endsWith("/refresh")) {
       path = path.substring("/workspaces/".length);
-      path = path.substring(0, path.length - "/refresh".length)
-      console.log(`${login} is asking for refresh on: ${ path }`)
-        model.modelRefresh(path)
-        .then(()=>{
-          console.log('model created')
-          res.statusCode = 200;
-          return res.end("{}")
-        })
-        .catch((err) => {
-            if (err) throw err;
-        })
+      path = path.substring(0, path.length - "/refresh".length);
+      console.log(`${login} is asking for refresh on: ${ path }`);
+      model.modelRefresh(path)
+      .then(()=>{
+        console.log('model created');
+        res.statusCode = 200;
+        return res.end("{}")
+      })
+      .catch((err) => {
+          if (err) throw err;
+      })
     }
 
     else if(path.startsWith("/workspaces/") && path.endsWith("/addWks")) {
-      console.log(`${login} is asking for adding a new workspace`)
+      console.log(`${login} is asking for adding a new workspace`);
       path = path.substring("/workspaces/".length);
-      path = path.substring(0, path.length - "/addWks".length)
-          addWks.createWks(query.name,query.login,query.psw,query.url)
-          .then(()=>{
-            res.statusCode = 200;
-            return res.end('{"status":"OK"}')
-          }).catch((err) => {
-            if (err) throw err;
-          })
+      path = path.substring(0, path.length - "/addWks".length);
+      addWks.createWks(query.name,query.login,query.psw,query.url)
+      .then(()=>{
+        res.statusCode = 200;
+        return res.end('{"status":"OK"}')
+      }).catch((err) => {
+        if (err) throw err;
+      });
     }
 
     else if(path.startsWith("/workspaces/") && path.endsWith("/data")) {
       path = path.substring("/workspaces/".length);
-      path = path.substring(0, path.length - "/data".length)
-      console.log(`${login} is asking for adding dataquerie`)
-      aPath  = path.split("/")
+      path = path.substring(0, path.length - "/data".length);
+      console.log(`${login} is asking for adding data query`);
+      let aPath  = path.split("/");
       sendData.sendData(aPath)
       .then((data)=>{
         res.statusCode = 200;
-        res.write(data)
-        console.log('data send')
+        res.write(data);
+        console.log('data send');
         return res.end();
       })
       .catch((err) => {
         if (err) throw err;
-      })
+      });
     }
 
     else if(path.startsWith("/workspaces/") && path.endsWith("/visuals")) {
@@ -100,7 +100,7 @@ exports.server = () => {
       path = path.substring(0, path.length - "/visuals".length)
       if(!storage.soundFileName(path))
         return notFound(res);
-      console.log(`${login} is asking for refresh on: ${ path }`)
+      console.log(`${login} is asking for visuals on: ${ path }`)
       workspace.getVisuals(login, path, (err, fd) => {
       if(err) return badRequest(res, err);
       res.statusCode = 200;
