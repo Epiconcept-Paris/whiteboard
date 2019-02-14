@@ -52,42 +52,42 @@ var visualGallery = [
   {
     "name": "Lines", "icon": "icons/line.png", "alt": "Line Chart",
     "fields": [
-      {"name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
-      {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+      {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "legend", "name": "Legend", "type": "axis", "arity": "1", "group": "data", "values": []}
     ]
   },
   {
     "name": "Bars", "icon": "icons/bar.png", "alt": "Bar Chart",
     "fields": [
-      {"name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
-      {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []},
-      {"name": "Legend", "type": "axis", "arity": "1", "group": "data", "values": []}
+      {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   },
   {
     "name": "Scatter", "icon": "icons/scatter.png", "alt": "Scatter Plot",
     "fields": [
-      {"name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
-      {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+      {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   },
   {
     "name": "Table", "icon": "icons/table.png", "alt": "Table",
     "fields": [
-      {"name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
-      {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+      {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   },
   {
     "name": "Sample", "icon": "icons/lines.png", "alt": "Sample",
     "fields": [
-      {"name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
-      {"name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+      {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   }
 ];
