@@ -56,28 +56,26 @@ var query = function() {
     });
   };
   this.data = function() {
-    var grouped = {}
+    var grouped = {};
     var raw = this.rawData();
     //grouping
     return raw.then((d)=>{
       d.forEach(line => {
-        var key = this.getGroupKey(line)
+        var key = this.getGroupKey(line);
         if(!Boolean(grouped[key]))
         grouped[key] = [];
         line["__count__"] = 1; //This is for allowing counting
         grouped[key].push(line);
-      })
-      //reducing
-      var reduced = Object.keys(grouped)
-      .map(key => grouped[key].reduce(this.reduceLines))
-      .map(groupedLine => {
-        Object.keys(this.measures).forEach(columnKey => groupedLine[columnKey] = [].concat[groupedLine[columnKey]][0])
-        return groupedLine
       });
-
-      return reduced;
+      //reducing
+      return Object.keys(grouped)
+        .map(key => grouped[key].reduce(this.reduceLines))
+        .map(groupedLine => {
+          Object.keys(this.measures).forEach(columnKey => groupedLine[columnKey] = [].concat[groupedLine[columnKey]][0])
+          return groupedLine;
+        });
     })
-  }
+  };
 
   this.getGroupKey = function(line) {
     if(Object.keys(this.axis).length == 0) return "~~";
@@ -98,4 +96,4 @@ var query = function() {
     return line;
   }
 
-}
+};
