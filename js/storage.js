@@ -42,7 +42,7 @@ const storage = {
         if (request.readyState === XMLHttpRequest.DONE) {
           // everything is good, the response is received
           if (request.status === 200) {
-            console.log('row data received');
+            // console.log('row data received');
             const rowData = JSON.parse(request.responseText);
             resolve(rowData)
           } else {

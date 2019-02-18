@@ -520,8 +520,8 @@ function visualResizable(selection) {
 }
 
 function renderVisualData(visualsSel) {
-  var svg = visualsSel.select("svg")
-  if (svg.size() == 0) svg = visualsSel.append("svg")
+  var svg = visualsSel.select("svg");
+  if (svg.size() === 0) svg = visualsSel.append("svg");
   svg
     .classed("visual-data", true)
     .attr("width", function (d) {
@@ -533,39 +533,45 @@ function renderVisualData(visualsSel) {
     .each(function (d, i, g) {
       var data = null;
       if (d.renderAs) {
-        var fields = d.renderAs.fields.filter(f => f.values.filter(v => v.type != "empty").length > 0)
+        var visualFields = d.renderAs.fields.filter(f => f.values.filter(v => v.type !== "empty").length > 0);
         var properties = {
-          "series_colors": ["#66CDAA", "#ff7500"]
-          , "series_names": ["serie 1", "serie 2"]
-          , "xAxis_format": ",.0f"
-          , "yAxis_format": ""
-          , "tooltip_format": ",.0f"
-          , "show_legend": true
-          , "show_labels": true
-          , "labels_format": true
-          , "columns_name": {}
-        }
-        fields.forEach((d, i) => {
-          properties.columns_name[fields[i].name] = fields[i].values.map((v) => v.name).filter(n => n.length > 0)
-        })
-        if (fields.length > 0) {
-          var usedFields = fields.map(f => f.values).reduce((f1, f2) => f1.concat(f2)).filter(f => f.type !== "empty")
+          series_colors: ["#66CDAA", "#ff7500"],
+          series_names: ["serie 1", "serie 2"],
+          xAxis_format: ",.0f",
+          yAxis_format: "",
+          tooltip_format: ",.0f",
+          show_legend: true,
+          show_labels: true,
+          labels_format: true,
+          columns: {}
+        };
+        visualFields.forEach((d, i) => {
+          properties.columns[visualFields[i].id] = visualFields[i].values.map((v) => {
+            return {name: v.name, dataType: v.dataType };
+          });
+        });
+        if (visualFields.length > 0) {
+          var usedFields = visualFields.map(f => f.values).reduce((f1, f2) => f1.concat(f2)).filter(f => f.type !== "empty");
           var q = new query();
           q.addFields(usedFields);
           data = q.data();
-
         }
       }
       //var visualIndex = visualGallery.map(v => v.name).indexOf(d.renderAs.name)
-      if (data == null) vRender[(d.renderAs && d.renderAs.name) ? d.renderAs.name : visualGallery[0].name].render(d3.select(g[i]), null);
-      else data.then((d) => vRender[(d.renderAs && d.renderAs.name) ? d.renderAs.name : visualGallery[0].name].render(d3.select(g[i]), d, properties))
-    })
+      if (data == null) {
+        vRender[(d.renderAs && d.renderAs.name) ? d.renderAs.name : visualGallery[0].name].render(d3.select(g[i]), data);
+      } else {
+        data.then(resp => {
+          vRender[(d.renderAs && d.renderAs.name) ? d.renderAs.name : visualGallery[0].name].render(d3.select(g[i]), resp, properties)
+        });
+      }
+    });
 }
 
 function fieldDragStart() {
   draggingField = true;
   d3.select("div.grid").attr("style", "z-index:4");
-  var dragField = d3.select("#dragField")
+  var dragField = d3.select("#dragField");
   var clone = JSON.parse(JSON.stringify(d3.event.subject));
   dragField
     .text(clone.name)
@@ -749,6 +755,7 @@ function renderVisuals() {
 }
 
 function resizeVisuals(selection) {
+  // console.log('in resizeVisuals');
   var visuals = selection
     .style("width", function (d) {
       return (d.x1 - d.x0) + "px";
@@ -936,6 +943,7 @@ function showActionsAt(visualIndex) {
 function showOptionsAt(visualIndex) {
   currentVisualOptionIndex = visualIndex;
   if (!visuals[visualIndex].renderAs) {
+    // console.log('showing options on drop, then calling changeRender', visuals[visualIndex]);
     changeRender(visuals[visualIndex]);
   }
 
@@ -986,6 +994,7 @@ function showOptionsAt(visualIndex) {
       d3.select(this).classed("focus2", false);
     })
     .on("click", function (d, i) {
+      console.log('what have i clicked on?', visualGallery[i]);
       changeRender(visuals[currentVisualOptionIndex], visualGallery[i]);
       showOptionsAt(currentVisualOptionIndex);
     })
@@ -1097,40 +1106,41 @@ function showOptionsAt(visualIndex) {
 }
 
 function changeRender(visual, renderAs) {
+  // console.log('in changeRender', visual, renderAs);
   var first = false;
   if (!renderAs) {
     renderAs = visualGallery[0];
     first = true;
   }
-  if (visual.renderAs && visual.renderAs.name == renderAs.name)
+  if (visual.renderAs && visual.renderAs.name === renderAs.name)
     return;
 
   renderAs = JSON.parse(JSON.stringify(renderAs));
   for (var i = 0; i < renderAs.fields.length; i++) {
-    if (renderAs.fields[i].type == "axis" || renderAs.fields[i].type == "measure") {
+    if (renderAs.fields[i].type === "axis" || renderAs.fields[i].type === "measure") {
       if (first) {
         renderAs.fields[i].values = [d3.select("#dragField").datum()];
         first = false;
-      }
-      else
+      } else {
         renderAs.fields[i].values = [{"type": "empty", "name": ""}];
+      }
     }
     else
       renderAs.fields[i].values = [];
   }
   renderAs.unusedFields = [];
   if (visual.renderAs) {
-    oldRender = visual.renderAs
+    let oldRender = visual.renderAs;
     if (oldRender.unusedFields) {
-      for (var i = 0; i < oldRender.unusedFields.length; i++) {
+      for (let i = 0; i < oldRender.unusedFields.length; i++) {
         oldRender.fields.push(oldRender.unusedFields[i]);
       }
     }
-    for (var i = 0; i < oldRender.fields.length; i++) {
+    for (let i = 0; i < oldRender.fields.length; i++) {
       //Try to find a field with the same name
       var old = oldRender.fields[i];
       for (j = 0; j < renderAs.fields.length; j++) {
-        if (renderAs.fields[j].name == old.name && renderAs.fields[j].type == old.type && old.values && old.values.length > 0) {
+        if (renderAs.fields[j].id === old.id && renderAs.fields[j].type === old.type && old.values && old.values.length > 0) {
           while (old.values.length > 0 && !(renderAs.fields[j].arity == "1" && renderAs.fields[j].values && renderAs.fields[j].values.length > 1)) {
             if (!renderAs.values) {
               renderAs.values = [];
@@ -1256,15 +1266,15 @@ function removeSelectedFields() {
 
 function dropSelectedField() {
   var changes = false;
-  if (draggingField) {
+  if (draggingField && visuals[currentVisualOptionIndex]) {
     var fields = visuals[currentVisualOptionIndex].renderAs.fields;
     for (var i = 0; i < fields.length; i++) {
       for (var j = 0; j < fields[i].values.length; j++) {
-        if (fields[i].values[j].type == "selected" && fields[i].arity == "*") {
+        if (fields[i].values[j].type === "selected" && fields[i].arity === "*") {
           fields[i].values[j] = fields[i].values[j].candidate;
           changes = true;
         }
-        else if (fields[i].values[j].type == "selected" && fields[i].arity == "1") {
+        else if (fields[i].values[j].type === "selected" && fields[i].arity === "1") {
           fields[i].values = [fields[i].values[j].candidate];
           changes = true;
         }
