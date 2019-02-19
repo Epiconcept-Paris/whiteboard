@@ -54,8 +54,9 @@ var visualGallery = [
     "fields": [
       {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
       {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
-      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []},
-      {"id": "legend", "name": "Legend", "type": "axis", "arity": "1", "group": "data", "values": []}
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+      // ,
+      // {"id": "legend", "name": "Legend", "type": "axis", "arity": "1", "group": "data", "values": []}
     ]
   },
   {
@@ -70,7 +71,7 @@ var visualGallery = [
     "name": "Scatter", "icon": "icons/scatter.png", "alt": "Scatter Plot",
     "fields": [
       {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"id": "category", "name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
       {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   },
@@ -78,7 +79,7 @@ var visualGallery = [
     "name": "Table", "icon": "icons/table.png", "alt": "Table",
     "fields": [
       {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"id": "category", "name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
       {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   },
@@ -86,7 +87,7 @@ var visualGallery = [
     "name": "Sample", "icon": "icons/lines.png", "alt": "Sample",
     "fields": [
       {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"id": "category", "name": "Category", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
       {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
   }
