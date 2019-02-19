@@ -381,7 +381,7 @@ vRender["Lines"].render = function(svg, data, properties) {
   chart.append("path")
     .attr("class", "line")
     .attr("fill", "none")
-    .attr("stroke-width", defaultAttributes.strokeWidth)
+    .attr("stroke-width", defaultAttributes.strokeWidth + 'px')
     .attr("d", line(data));
 
   // add the X grid lines
@@ -440,10 +440,10 @@ vRender["Lines"].render = function(svg, data, properties) {
   function calcAttributes(width) {
 
     var defaultAttributes = {
-      strokeWidth: '1px',
+      strokeWidth: 1,
       circleRadius: 1.5,
-      minStrokeWidth: '1px',
-      maxStrokeWidth: '4px',
+      minStrokeWidth: 1,
+      maxStrokeWidth: 3,
       minCircleRadius: 1.5,
       maxCircleRadius: 4
     };
@@ -452,10 +452,9 @@ vRender["Lines"].render = function(svg, data, properties) {
     if (aCanvas.node()) {
       var oCanvas = aCanvas.node().getBoundingClientRect();
       var ratioWidth = width / oCanvas.width;
-      // var ratioHeight = height / oCanvas.height;
 
-      defaultAttributes.strokeWidth = Math.ceil(ratioWidth * 4) + 'px';
-      defaultAttributes.circleRadius = Math.round((ratioWidth * 4) * 10) / 10;
+      defaultAttributes.strokeWidth = (Math.ceil(ratioWidth * 3)) < defaultAttributes.maxStrokeWidth ? Math.ceil(ratioWidth * 3) : defaultAttributes.maxStrokeWidth;
+      defaultAttributes.circleRadius = ((Math.round((ratioWidth * 4) * 10) / 10) < defaultAttributes.maxCircleRadius) ? (Math.round((ratioWidth * 4) * 10) / 10) : defaultAttributes.maxCircleRadius;
     }
 
     return defaultAttributes;
