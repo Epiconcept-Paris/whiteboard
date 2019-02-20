@@ -1019,7 +1019,13 @@ function showOptionsAt(visualIndex) {
   //Creating new lines
   var newLines = lines.enter().append("div").classed("options-detail-line", true);
   newLines.append("div").classed("options-detail", true).classed("options-detail-name", true);
-  var placeHolders = newLines.append("div").classed("options-detail", true).classed("value-placeholder", true)
+  newLines.append("div").classed("options-detail", true)
+    .classed("value-placeholder", function (d) {
+      return (d.type === "measure" || d.type === "axis");
+    })
+    .classed("value-input", function (d) {
+      return (d.type !== "measure" && d.type !== "axis");
+    })
     .on("mouseover", function (d) {
       d.mouseover = true;
     })
