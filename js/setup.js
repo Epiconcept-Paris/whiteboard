@@ -520,6 +520,7 @@ function visualResizable(selection) {
 }
 
 function renderVisualData(visualsSel) {
+  // console.log('in renderVisualData');
   var svg = visualsSel.select("svg");
   if (svg.size() === 0) svg = visualsSel.append("svg");
   svg
@@ -534,6 +535,7 @@ function renderVisualData(visualsSel) {
       var data = null;
       if (d.renderAs) {
         var visualFields = d.renderAs.fields.filter(f => f.values.filter(v => v.type !== "empty").length > 0);
+        // console.log(visualFields);
         var properties = {
           series_colors: ["#66CDAA", "#ff7500"],
           series_names: ["serie 1", "serie 2"],
@@ -687,6 +689,8 @@ function getVisualId(dat) {
 }
 
 function renderVisual(currentVisual, x0, x1, y0, y1, posx, posy, width, height, title, fields) {
+  // console.log('in renderVisual');
+
   //$("#console").text("x0:"+x0+", x1:"+x1+", y0:"+y0+", y1:"+y1+", posx:"+posx+", posy:"+posy+", width:"+width+", height:"+height+", title:"+title+", fields:"+fields)
   if (!currentVisual) {
     lastVisualId++;
@@ -730,6 +734,7 @@ function renderVisual(currentVisual, x0, x1, y0, y1, posx, posy, width, height, 
 }
 
 function renderVisuals() {
+  // console.log('in renderVisuals');
   var existing = d3.select("div.canvas").selectAll("div.visual-container").data(visuals, getVisualId);
   var newVisuals = existing.enter();
   var deletedVisuals = existing.exit();
@@ -975,7 +980,7 @@ function showOptionsAt(visualIndex) {
       return d;
     });
 
-  var icons = options.select("div.pick-render").selectAll("div").data(visualGallery)
+  var icons = options.select("div.pick-render").selectAll("div").data(visualGallery);
   var newIcons = icons.enter().append("div").append("img")
     .attr("src", function (d) {
       return "img/" + d.icon
@@ -994,7 +999,6 @@ function showOptionsAt(visualIndex) {
       d3.select(this).classed("focus2", false);
     })
     .on("click", function (d, i) {
-      console.log('what have i clicked on?', visualGallery[i]);
       changeRender(visuals[currentVisualOptionIndex], visualGallery[i]);
       showOptionsAt(currentVisualOptionIndex);
     })
@@ -1002,14 +1006,16 @@ function showOptionsAt(visualIndex) {
 
   icons.select("img").merge(newIcons)
     .classed("focus", function (d) {
-      return d.name == visuals[visualIndex].renderAs.name;
-    })
+      return d.name === visuals[visualIndex].renderAs.name;
+    });
 
   var lines = options.select("div.options-details").selectAll("div.options-detail-line").data(visuals[visualIndex].renderAs.fields);
+
   //updating existing children datums
   lines.selectAll("div.options-detail").datum(function (d, i, group) {
-    return group[i].parentNode.__data__
+    return group[i].parentNode.__data__;
   });
+
   //Creating new lines
   var newLines = lines.enter().append("div").classed("options-detail-line", true);
   newLines.append("div").classed("options-detail", true).classed("options-detail-name", true);
@@ -1031,7 +1037,7 @@ function showOptionsAt(visualIndex) {
   //Updating all lines (news + existing)
   var allLines = lines.merge(newLines);
   allLines.select("div.options-detail-name").text(function (d) {
-    return d.name
+    return d.name;
   });
 
   var vals = allLines.select("div.value-placeholder").selectAll("div.field-value").data(function (d) {
@@ -1040,16 +1046,16 @@ function showOptionsAt(visualIndex) {
 
   var news = vals.enter().append("div").classed("field-value", true)
     .on("mouseover", function (d, i, group) {
-      if (!draggingField && d.type != "empty") {
-        var div = d3.select(group[i]).classed("focus", true)
-        if (div.selectAll("div.close-button").size() == 0)
+      if (!draggingField && d.type !== "empty") {
+        var div = d3.select(group[i]).classed("focus", true);
+        if (div.selectAll("div.close-button").size() === 0)
           div.insert("div", "div.function-choice").text("x").classed("close-button", true).on("click", function (d, i, group) {
             d.type = "selected";
             removingField = true;
             removeSelectedFields();
             removingField = false;
           });
-        if (div.selectAll("img.triangle-button").size() == 0)
+        if (div.selectAll("img.triangle-button").size() === 0)
           div.insert("img", "div.function-choice").attr("src", "img/invertedTriangle.png").classed("triangle-button", true)
             .on("click", function (d, i, group) {
               renderFieldFunctions(d, group[i].parentNode.parentNode.__data__, group[i].parentNode.parentNode);
@@ -1070,15 +1076,16 @@ function showOptionsAt(visualIndex) {
       }
     })
   ;
-  var allvals = vals.merge(news)
+
+  vals.merge(news)
     .classed("empty-field", function (d) {
-      return d.type == "empty";
+      return d.type === "empty";
     })
     .classed("candidate-field-single", function (d, i, group) {
-      return d.type == "selected" && group[i].parentNode.__data__.arity == "1"
+      return d.type === "selected" && group[i].parentNode.__data__.arity === "1"
     })
     .classed("candidate-field-multi", function (d, i, group) {
-      return d.type == "selected" && group[i].parentNode.__data__.arity == "*"
+      return d.type === "selected" && group[i].parentNode.__data__.arity === "*"
     })
     .text(function (d) {
       return d.name;
@@ -1091,8 +1098,7 @@ function showOptionsAt(visualIndex) {
   options
     .style("left", ((pBox.x + window.scrollX) + visuals[visualIndex].x0) + "px")
     .style("top", (pBox.y + window.scrollY + visuals[visualIndex].y1 + 1) + "px").style("display", "flex")
-    .style("width", (visuals[visualIndex].x1 - visuals[visualIndex].x0) + "px")
-  ;
+    .style("width", (visuals[visualIndex].x1 - visuals[visualIndex].x0) + "px");
 
 
   if (draggingField) {
@@ -1173,9 +1179,11 @@ function hideActions() {
 function showDropOptions() {
   if (draggingField) {
     var field = d3.select("#dragField").datum();
-    var places = d3.select("#options").select("div.options-details").selectAll("div.options-detail-line").selectAll("div.value-placeholder");
+    var places = d3.select("#options")
+      .select("div.options-details")
+      .selectAll("div.options-detail-line").selectAll("div.value-placeholder");
     places.classed("accept-field", function (d) {
-      d.acceptingField = (d.type == "measure" || (d.type == "axis" && field.type == "column"))
+      d.acceptingField = (d.type === "measure" || (d.type === "axis" && field.type === "column"));
       return d.acceptingField;
     });
   }

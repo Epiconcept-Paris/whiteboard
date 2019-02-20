@@ -422,6 +422,10 @@ div.value-placeholder {
   background-color: #EEEEEE;
 }
 
+div.value-input input {
+  width: 100%;
+}
+
 div.close-button {
   float: right;
   cursor: pointer;
