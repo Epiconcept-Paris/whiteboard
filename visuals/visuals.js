@@ -319,7 +319,7 @@ vRender["Lines"].render = function(svg, data, properties) {
   });
 
   // set default margins, width and height of chart
-  var margin = {top: 10, right: 20, bottom: 20, left: 30},
+  var margin = {top: 20, right: 20, bottom: 30, left: 30},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom;
 
@@ -328,6 +328,13 @@ vRender["Lines"].render = function(svg, data, properties) {
 
   // add margins to chart
   var chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // add title
+  chart.append("text")
+    .attr("x", (width / 2))
+    .attr("y", (height + margin.bottom))
+    .attr("text-anchor", "middle")
+    .text(properties.title);
 
   // define y-axis and its domain
   var y = d3.scaleLinear().rangeRound([height, 0]);

@@ -532,19 +532,21 @@ function renderVisualData(visualsSel) {
       return (d.y1 - d.y0)
     })
     .each(function (d, i, g) {
+      // console.log(d);
       var data = null;
       if (d.renderAs) {
         var visualFields = d.renderAs.fields.filter(f => f.values.filter(v => v.type !== "empty").length > 0);
         // console.log(visualFields);
         var properties = {
-          series_colors: ["#66CDAA", "#ff7500"],
-          series_names: ["serie 1", "serie 2"],
+          // series_colors: ["#66CDAA", "#ff7500"],
+          // series_names: ["serie 1", "serie 2"],
           xAxis_format: ",.0f",
           yAxis_format: "",
           tooltip_format: ",.0f",
           show_legend: true,
           show_labels: true,
           labels_format: true,
+          title: d.title,
           columns: {}
         };
         visualFields.forEach((d, i) => {
@@ -704,7 +706,7 @@ function renderVisual(currentVisual, x0, x1, y0, y1, posx, posy, width, height, 
       "posy": posy,
       "width": width,
       "height": height,
-      "title": title,
+      "title": title !== undefined ? title : '',
       "fields": fields,
       "update": false,
       "renderAs": null
@@ -722,7 +724,7 @@ function renderVisual(currentVisual, x0, x1, y0, y1, posx, posy, width, height, 
         visuals[i].posy = posy;
         visuals[i].height = height;
         visuals[i].width = width;
-        visuals[i].title = title;
+        visuals[i].title = title !== undefined ? title : (currentVisual.title !== undefined ? currentVisual.title : '');
         visuals[i].fields = fields;
       }
       else {
@@ -743,7 +745,7 @@ function renderVisuals() {
   newVisuals.append("div")
     .call(resizeVisuals)
     .classed("visual-container", true)
-    .call(visualDraggable)
+    .call(visualDraggable);
 
   //deleting removed
   deletedVisuals.remove();
@@ -761,7 +763,8 @@ function renderVisuals() {
 
 function resizeVisuals(selection) {
   // console.log('in resizeVisuals');
-  var visuals = selection
+  // console.log(visuals);
+  selection
     .style("width", function (d) {
       return (d.x1 - d.x0) + "px";
     })
@@ -775,7 +778,7 @@ function resizeVisuals(selection) {
       return d.y0 + "px";
     })
     .call(drawResizeLines)
-    .call(renderVisualData)
+    .call(renderVisualData);
 }
 
 function drawResizeLines(visuals) {
@@ -1049,6 +1052,22 @@ function showOptionsAt(visualIndex) {
   var vals = allLines.select("div.value-placeholder").selectAll("div.field-value").data(function (d) {
     return d.values;
   });
+
+  // input fields for properties of type string and send value to add to visual
+  allLines.select("div.value-input")
+    .html(function (d) {
+      if (d.type === 'string') {
+        return '<input type="text" class="text-title" value="' + visuals[currentVisualOptionIndex][d.id] + '"/>';
+      }
+    })
+    .on("change", function (d, i, group) {
+      // console.log(d, i, group);
+      // console.log(group[i].querySelector('input').value, 'value');
+      var visual = visuals[currentVisualOptionIndex];
+      // visual[d.id] = group[i].querySelector('input').value;
+
+      renderVisual(visual, visual.x0, visual.x1, visual.y0, visual.y1, visual.posx, visual.posy, visual.width, visual.height, group[i].querySelector('input').value);
+    });
 
   var news = vals.enter().append("div").classed("field-value", true)
     .on("mouseover", function (d, i, group) {
