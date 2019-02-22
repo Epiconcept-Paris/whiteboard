@@ -256,22 +256,20 @@ vRender["Lines"].render = function(svg, data, properties) {
 
   // fetch measure
   if( typeof properties.columns.measure === 'undefined' || typeof properties.columns.measure[0] === 'undefined')
-    properties.columns.measure = { name: "__count__", dataType: "integer" };
-  else
-    properties.columns.measure = properties.columns.measure[0];
+    properties.columns.measure = [{ name: "__count__", dataType: "integer" }];
 
-  var oMeasureField = properties.columns.measure;
+  var aMeasureField = properties.columns.measure;
 
   // fetch category
   properties.columns.category = properties.columns.category[0];
   var oCategoryField = properties.columns.category;
 
-  // fetch legend
-  var fieldLegend = true;
-  if( typeof properties.columns.legend === 'undefined')
-    fieldLegend = false;
-  else
-    properties.columns.legend = properties.columns.legend[0];
+  // // fetch legend
+  // var fieldLegend = true;
+  // if( typeof properties.columns.legend === 'undefined')
+  //   fieldLegend = false;
+  // else
+  //   properties.columns.legend = properties.columns.legend[0];
 
   // replace null values with 'n/a' for category used
   data.forEach(item => {
@@ -282,34 +280,23 @@ vRender["Lines"].render = function(svg, data, properties) {
 
   var parseTime = d3.timeParse('%Y-%m-%d');
 
-  // group by chosen category
-  data = d3.nest().key(function (d) {
-    return d[oCategoryField.name];
-  })
-  .rollup(function (leaves) {
-    return d3.sum(leaves, function (d) {
-      return d[oMeasureField.name];
-    })
-  })
-  .entries(data)
-  .map(function (d) {
+  data = data.map(function (d) {
     switch (oCategoryField.dataType) {
       case 'integer':
       case 'float':
-        d.key = parseFloat(d.key);
+        d[oCategoryField.name] = parseFloat(d[oCategoryField.name]);
         break;
 
       case 'date':
-        d.key = parseTime(d.key);
+        d[oCategoryField.name] = parseTime(d[oCategoryField.name]);
         break;
 
       default:
         break;
     }
-    d[oCategoryField.name] = d.key;
-    d[oMeasureField.name] = d.value;
-    delete d.key;
-    delete d.value;
+    aMeasureField.forEach(function (oMeasureField) {
+      d[oMeasureField.name] = d[oMeasureField.name] ? parseFloat(d[oMeasureField.name]) : d[oMeasureField.name];
+    });
     return d;
   });
 
@@ -317,6 +304,37 @@ vRender["Lines"].render = function(svg, data, properties) {
   data.sort(function (a, b) {
     return b[oCategoryField.name] - a[oCategoryField.name];
   });
+
+  // // group by chosen category
+  // data = d3.nest().key(function (d) {
+  //   return d[oCategoryField.name];
+  // })
+  // .rollup(function (leaves) {
+  //   return d3.sum(leaves, function (d) {
+  //     return d[oMeasureField.name];
+  //   })
+  // })
+  // .entries(data)
+  // .map(function (d) {
+  //   switch (oCategoryField.dataType) {
+  //     case 'integer':
+  //     case 'float':
+  //       d.key = parseFloat(d.key);
+  //       break;
+  //
+  //     case 'date':
+  //       d.key = parseTime(d.key);
+  //       break;
+  //
+  //     default:
+  //       break;
+  //   }
+  //   d[oCategoryField.name] = d.key;
+  //   d[oMeasureField.name] = d.value;
+  //   delete d.key;
+  //   delete d.value;
+  //   return d;
+  // });
 
   // set default margins, width and height of chart
   var margin = {top: 20, right: 20, bottom: 30, left: 30},
@@ -329,17 +347,43 @@ vRender["Lines"].render = function(svg, data, properties) {
   // add margins to chart
   var chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // add title
+  // add title at bottom of page
   chart.append("text")
     .attr("x", (width / 2))
     .attr("y", (height + margin.bottom))
     .attr("text-anchor", "middle")
     .text(properties.title);
 
+  // group data according to measure(s)
+  var tData = [];
+  aMeasureField.forEach(function (oMeasureField) {
+    var cpData = data.map(a => Object.assign({}, a));
+    var tmpData = d3.nest()
+      .key(function () {
+        return oMeasureField.name;
+      })
+      .entries(cpData)[0];
+
+    tmpData.values.map(function (o) {
+      o.measure = o[oMeasureField.name];
+      Object.keys(o).forEach(function (key) {
+        if (key !== oCategoryField.name && key !== 'measure') {
+          delete o[key];
+        }
+      });
+      return o;
+    });
+    tData.push(tmpData);
+  });
+
   // define y-axis and its domain
   var y = d3.scaleLinear().rangeRound([height, 0]);
-  var minY = d3.min(data, function(d) { return d[oMeasureField.name]; });
-  var maxY = d3.max(data, function(d) { return d[oMeasureField.name]; });
+  var minY = d3.min(tData, function(c) { return d3.min(c.values, function (d) {
+    return d.measure;
+  }); });
+  var maxY = d3.max(tData, function(c) { return d3.max(c.values, function (d) {
+    return d.measure;
+  }); });
   y.domain([minY, maxY]).nice();
 
   // define x-axis and its domain
@@ -371,7 +415,10 @@ vRender["Lines"].render = function(svg, data, properties) {
   // define line
   var line = d3.line()
     .x(function(d) { return x(d[oCategoryField.name]); })
-    .y(function(d) { return y(d[oMeasureField.name]); });
+    .y(function(d) { return y(d.measure); });
+
+  // generate colors automatically
+  var color = d3.scaleOrdinal(d3.schemeCategory10);
 
   // add x-axis
   chart.append("g")
@@ -383,13 +430,6 @@ vRender["Lines"].render = function(svg, data, properties) {
   chart.append("g")
     .attr("class", "axis axis--y")
     .call(d3.axisLeft(y));
-
-  // add line
-  chart.append("path")
-    .attr("class", "line")
-    .attr("fill", "none")
-    .attr("stroke-width", defaultAttributes.strokeWidth + 'px')
-    .attr("d", line(data));
 
   // add the X grid lines
   chart.append("g")
@@ -407,21 +447,41 @@ vRender["Lines"].render = function(svg, data, properties) {
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+  //add lines
+  chart.append('g')
+    .attr('class', 'lines');
+
+  chart.selectAll('line-group')
+    .data(tData).enter()
+    .append('g')
+    .attr('class', 'line-group')
+    .append('path')
+    .attr('class', 'line')
+    .attr("fill", "none")
+    .attr("stroke-width", defaultAttributes.strokeWidth + "px")
+    .attr('d', function(d) { return line(d.values); })
+    .style('stroke', function (d, i) { return color(i); });
+
   // add dots and tooltip on hover
-  chart.selectAll("circle")
-    .data(data)
-    .enter().append("circle")
-    .attr("class", "circle")
-    .attr("cx", function(d) { return x(d[oCategoryField.name]) ; })
-    .attr("cy", function(d) { return y(d[oMeasureField.name]) ; })
-    .attr("r", defaultAttributes.circleRadius)
+  chart.selectAll('circle-group')
+    .data(tData).enter()
+    .append('g')
+    .style('fill', function (d, i) { return color(i); })
+    .selectAll('circle')
+    .data(function (d) { return d.values; }).enter()
+    .append('circle')
+    .attr('class', 'circle')
+    .attr('cx', function (d) { return x(d[oCategoryField.name]); })
+    .attr('cy', function (d) { return y(d.measure); })
+    .attr('r', defaultAttributes.circleRadius)
     .on("mouseover", function (d) {
       tooltip.transition()
-        .duration(400)
+        .duration(500)
+        .ease(d3.easeLinear)
         .style("opacity", .9);
-      tooltip.html("<span>"  + oCategoryField.name + ": "+ d[oCategoryField.name]
+      tooltip.html("<span>" + d[oCategoryField.name]
         + "<br>"
-        + oMeasureField.name + ": " + d[oMeasureField.name]
+        + d.measure
         + "</span>")
         .style("left", (d3.event.pageX) + "px")
         .style("top", (d3.event.pageY - 40) + "px");
@@ -432,17 +492,16 @@ vRender["Lines"].render = function(svg, data, properties) {
         .style("opacity", 0);
     });
 
-  chart.selectAll(".line").attr("stroke", "#4BCDDB");
-  chart.selectAll("circle").attr("fill", "#4BCDDB");
-
   // add animation to line(s)
-  var totalLength = d3.select(".line").node().getTotalLength();
-  chart.selectAll(".line")
-    .attr("stroke-dasharray", totalLength + " " + totalLength)
-    .attr("stroke-dashoffset", totalLength)
-    .transition()
-    .duration(500)
-    .attr("stroke-dashoffset", 0);
+  if (d3.select(".line").node()) {
+    var totalLength = d3.select(".line").node().getTotalLength();
+    chart.selectAll(".line")
+      .attr("stroke-dasharray", totalLength + " " + totalLength)
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+      .duration(500)
+      .attr("stroke-dashoffset", 0);
+  }
 
   function calcAttributes(width) {
 
@@ -466,6 +525,8 @@ vRender["Lines"].render = function(svg, data, properties) {
 
     return defaultAttributes;
   }
+
+  // ----------------------------------------------------------------------------------------------------------------------------- //
 
   // var series_values_all = fieldLegend ? data.map(d => d[properties.columns.legend]) : [properties.columns.measure];
   // var series_values =  series_values_all.filter((d, i) => i === series_values_all.indexOf(d));
