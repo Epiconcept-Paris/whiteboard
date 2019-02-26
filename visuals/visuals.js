@@ -298,24 +298,6 @@ vRender["Lines"].render = function(svg, data, properties) {
     return b[oCategoryField.name] - a[oCategoryField.name];
   });
 
-  // set default margins, width and height of chart
-  var margin = {top: 20, right: 20, bottom: 30, left: 30},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom;
-
-  // determine certain attributes (stroke width, circle radius) wrt size of chart
-  var defaultAttributes = calcAttributes(width, height);
-
-  // add margins to chart
-  var chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  // add title at bottom of page
-  chart.append("text")
-    .attr("x", (width / 2))
-    .attr("y", (height + margin.bottom))
-    .attr("text-anchor", "middle")
-    .text(properties.title);
-
   // group data according to measure(s)
   var tData = [];
   aMeasureField.forEach(function (oMeasureField) {
@@ -337,6 +319,46 @@ vRender["Lines"].render = function(svg, data, properties) {
     });
     tData.push(tmpData);
   });
+
+  // set default margins, width and height of chart
+  var margin = {top: 20, right: 20, bottom: 30, left: 30},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+  // determine certain attributes (stroke width, circle radius) wrt size of chart
+  var defaultAttributes = calcAttributes(width, height);
+
+  // add margins to chart
+  var chart = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // generate colors automatically
+  var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  // add title at bottom of page
+  chart.append("text")
+    .attr("x", (width / 2))
+    .attr("y", (height + margin.bottom))
+    .attr("text-anchor", "middle")
+    .text(properties.title);
+
+  // add legend
+  if (properties.show_legend) {
+    var legendSpace = width / tData.length;
+
+    chart.selectAll('legend-group')
+      .data(tData).enter()
+      .append('g')
+      .attr('class', 'legend-group')
+      .append('text')
+      .attr('class', 'legend')
+      .style('fill', function (d, i) { return color(i); })
+      .attr('x', function (d, i) {
+        return ( legendSpace / 2 ) + i*legendSpace;
+      })  // space legend
+      .attr('y', 0 - ( margin.top / 2 ) + 5 )
+      .attr('class', 'legend')
+      .text(function (d) { return d.key; });    // style the legend
+  }
 
   // define y-axis and its domain
   var y = d3.scaleLinear().rangeRound([height, 0]);
@@ -379,9 +401,6 @@ vRender["Lines"].render = function(svg, data, properties) {
     .x(function(d) { return x(d[oCategoryField.name]); })
     .y(function(d) { return y(d.measure); });
 
-  // generate colors automatically
-  var color = d3.scaleOrdinal(d3.schemeCategory10);
-
   // add x-axis
   chart.append("g")
     .attr("class", "axis axis--x")
@@ -423,28 +442,6 @@ vRender["Lines"].render = function(svg, data, properties) {
     .attr("stroke-width", defaultAttributes.strokeWidth + "px")
     .attr('d', function(d) { return line(d.values); })
     .style('stroke', function (d, i) { return color(i); });
-
-  // add legend and lines
-  if (properties.show_legend) {
-    console.log('in show legend logic');
-    var legendSpace = width / tData.length;
-
-    chart.selectAll('legend-group')
-      .data(tData).enter()
-      .append('g')
-      .attr('class', 'legend-group')
-      // .data(function (d) { return d.values }).enter()
-      .append('text')
-      .attr('class', 'legend')
-      .style('fill', function (d, i) { return color(i); })
-      .attr('x', function (d, i) {
-        return ( legendSpace / 2 ) + i*legendSpace;
-      })  // space legend
-      .attr('y', 0 - ( margin.top / 2 ) + 5 )
-      .attr('class', 'legend')
-      // .text('test');
-      .text(function (d) { return d.key; });    // style the legend
-  }
 
   // add dots and tooltip on hover
   chart.selectAll('circle-group')
