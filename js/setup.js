@@ -543,7 +543,7 @@ function renderVisualData(visualsSel) {
           xAxis_format: ",.0f",
           yAxis_format: "",
           tooltip_format: ",.0f",
-          show_legend: true,
+          show_legend: d['legend'] !== undefined ? d['legend'] : false,
           show_labels: true,
           labels_format: true,
           title: d.title,
@@ -1058,14 +1058,23 @@ function showOptionsAt(visualIndex) {
       if (d.type === 'string') {
         return '<input type="text" value="' + visuals[currentVisualOptionIndex][d.id] + '"/>';
       }
+      if (d.type === 'boolean') {
+        return '<input type="checkbox"' + (visuals[currentVisualOptionIndex][d.id] ? ' checked ' : '') + '/>';
+      }
     })
     .on("change", function (d, i, group) {
       // console.log(d, i, group);
       // console.log(group[i].querySelector('input').value, 'value');
       var visual = visuals[currentVisualOptionIndex];
-      // visual[d.id] = group[i].querySelector('input').value;
+      if (d.type === 'string') {
+        visual[d.id] = group[i].querySelector('input').value;
+      }
 
-      renderVisual(visual, visual.x0, visual.x1, visual.y0, visual.y1, visual.posx, visual.posy, visual.width, visual.height, group[i].querySelector('input').value);
+      if (d.type === 'boolean') {
+        visual[d.id] = group[i].querySelector('input').checked;
+      }
+
+      renderVisual(visual);
     });
 
   var news = vals.enter().append("div").classed("field-value", true)

@@ -54,9 +54,8 @@ var visualGallery = [
     "fields": [
       {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
       {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
-      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
-      // ,
-      // {"id": "legend", "name": "Legend", "type": "axis", "arity": "1", "group": "data", "values": []}
+      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []},
+      {"id": "legend", "name": "Legend", "type": "boolean", "arity": "1", "group": "data", "values": []}
     ]
   },
   {

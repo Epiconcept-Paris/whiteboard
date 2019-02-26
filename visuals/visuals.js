@@ -264,13 +264,6 @@ vRender["Lines"].render = function(svg, data, properties) {
   properties.columns.category = properties.columns.category[0];
   var oCategoryField = properties.columns.category;
 
-  // // fetch legend
-  // var fieldLegend = true;
-  // if( typeof properties.columns.legend === 'undefined')
-  //   fieldLegend = false;
-  // else
-  //   properties.columns.legend = properties.columns.legend[0];
-
   // replace null values with 'n/a' for category used
   data.forEach(item => {
     if (item[oCategoryField.name] === null) {
@@ -304,37 +297,6 @@ vRender["Lines"].render = function(svg, data, properties) {
   data.sort(function (a, b) {
     return b[oCategoryField.name] - a[oCategoryField.name];
   });
-
-  // // group by chosen category
-  // data = d3.nest().key(function (d) {
-  //   return d[oCategoryField.name];
-  // })
-  // .rollup(function (leaves) {
-  //   return d3.sum(leaves, function (d) {
-  //     return d[oMeasureField.name];
-  //   })
-  // })
-  // .entries(data)
-  // .map(function (d) {
-  //   switch (oCategoryField.dataType) {
-  //     case 'integer':
-  //     case 'float':
-  //       d.key = parseFloat(d.key);
-  //       break;
-  //
-  //     case 'date':
-  //       d.key = parseTime(d.key);
-  //       break;
-  //
-  //     default:
-  //       break;
-  //   }
-  //   d[oCategoryField.name] = d.key;
-  //   d[oMeasureField.name] = d.value;
-  //   delete d.key;
-  //   delete d.value;
-  //   return d;
-  // });
 
   // set default margins, width and height of chart
   var margin = {top: 20, right: 20, bottom: 30, left: 30},
@@ -461,6 +423,28 @@ vRender["Lines"].render = function(svg, data, properties) {
     .attr("stroke-width", defaultAttributes.strokeWidth + "px")
     .attr('d', function(d) { return line(d.values); })
     .style('stroke', function (d, i) { return color(i); });
+
+  // add legend and lines
+  if (properties.show_legend) {
+    console.log('in show legend logic');
+    var legendSpace = width / tData.length;
+
+    chart.selectAll('legend-group')
+      .data(tData).enter()
+      .append('g')
+      .attr('class', 'legend-group')
+      // .data(function (d) { return d.values }).enter()
+      .append('text')
+      .attr('class', 'legend')
+      .style('fill', function (d, i) { return color(i); })
+      .attr('x', function (d, i) {
+        return ( legendSpace / 2 ) + i*legendSpace;
+      })  // space legend
+      .attr('y', 0 - ( margin.top / 2 ) + 5 )
+      .attr('class', 'legend')
+      // .text('test');
+      .text(function (d) { return d.key; });    // style the legend
+  }
 
   // add dots and tooltip on hover
   chart.selectAll('circle-group')

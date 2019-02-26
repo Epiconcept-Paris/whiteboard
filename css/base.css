@@ -596,3 +596,7 @@ div.workspace-switch {
   color: #ffffff;
   padding: 5px;
 }
+
+.legend {
+  text-anchor: middle;
+}
