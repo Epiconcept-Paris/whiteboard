@@ -295,7 +295,7 @@ vRender["Lines"].render = function(svg, data, properties) {
 
   // sort according to category (ascending order)
   data.sort(function (a, b) {
-    return b[oCategoryField.name] - a[oCategoryField.name];
+    return a[oCategoryField.name] - b[oCategoryField.name];
   });
 
   // group data according to measure(s)
@@ -321,9 +321,11 @@ vRender["Lines"].render = function(svg, data, properties) {
   });
 
   // set default margins, width and height of chart
-  var margin = {top: 20, right: 20, bottom: 30, left: 30},
+  var margin = {top: 20, right: 20, bottom: properties.title ? 50 : 30, left: 30},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom;
+
+  var legendSpace = width / tData.length;
 
   // determine certain attributes (stroke width, circle radius) wrt size of chart
   var defaultAttributes = calcAttributes(width, height);
@@ -336,6 +338,7 @@ vRender["Lines"].render = function(svg, data, properties) {
 
   // add title at bottom of page
   chart.append("text")
+    .style("font-weight", "bold")
     .attr("x", (width / 2))
     .attr("y", (height + margin.bottom))
     .attr("text-anchor", "middle")
@@ -343,8 +346,6 @@ vRender["Lines"].render = function(svg, data, properties) {
 
   // add legend
   if (properties.show_legend) {
-    var legendSpace = width / tData.length;
-
     chart.selectAll('legend-group')
       .data(tData).enter()
       .append('g')
@@ -406,6 +407,12 @@ vRender["Lines"].render = function(svg, data, properties) {
     .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
+
+  // add x-axis label
+  chart.append("text")
+    .attr("transform", "translate(" + (width / 2) + ", " + (height + margin.bottom - (properties.title ? 20 : 0)) + ")")
+    .style("text-anchor", "middle")
+    .text(oCategoryField.name);
 
   // add y-axis
   chart.append("g")
