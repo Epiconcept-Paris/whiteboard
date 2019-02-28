@@ -321,7 +321,7 @@ vRender["Lines"].render = function(svg, data, properties) {
   });
 
   // set default margins, width and height of chart
-  var margin = {top: 20, right: 20, bottom: properties.title ? 50 : 30, left: 30},
+  var margin = calcMargins(tData),
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom;
 
@@ -353,10 +353,10 @@ vRender["Lines"].render = function(svg, data, properties) {
       .append('text')
       .attr('class', 'legend')
       .style('fill', function (d, i) { return color(i); })
-      .attr('x', function (d, i) {
-        return ( legendSpace / 2 ) + i*legendSpace;
-      })  // space legend
-      .attr('y', 0 - ( margin.top / 2 ) + 5 )
+      .attr('x', width / 2)
+      .attr('y', function (d, i) {
+        return 0 - (margin.top * ( i > 0 ? (i / tData.length) : 1 )) + 10;
+      })
       .attr('class', 'legend')
       .text(function (d) { return d.key; });    // style the legend
   }
@@ -463,11 +463,17 @@ vRender["Lines"].render = function(svg, data, properties) {
     .attr('cy', function (d) { return y(d.measure); })
     .attr('r', defaultAttributes.circleRadius)
     .on("mouseover", function (d) {
+      var mCategoryValue = d[oCategoryField.name];
+      switch (oCategoryField.dataType) {
+        case 'date':
+          mCategoryValue = d[oCategoryField.name].toLocaleDateString();
+          break;
+      }
       tooltip.transition()
         .duration(500)
         .ease(d3.easeLinear)
         .style("opacity", .9);
-      tooltip.html("<span>" + d[oCategoryField.name]
+      tooltip.html("<span>" + mCategoryValue
         + "<br>"
         + d.measure
         + "</span>")
@@ -497,9 +503,9 @@ vRender["Lines"].render = function(svg, data, properties) {
       strokeWidth: 1,
       circleRadius: 1.5,
       minStrokeWidth: 1,
-      maxStrokeWidth: 3,
+      maxStrokeWidth: 2,
       minCircleRadius: 1.5,
-      maxCircleRadius: 4
+      maxCircleRadius: 3
     };
 
     var aCanvas = d3.select('.canvas');
@@ -512,6 +518,25 @@ vRender["Lines"].render = function(svg, data, properties) {
     }
 
     return defaultAttributes;
+  }
+
+  function calcMargins(tData) {
+    var defaultMargins = {
+      top: 20,
+      right: 20,
+      bottom: 30,
+      left: 30
+    };
+
+    if (properties.title) {
+      defaultMargins.bottom += 20;
+    }
+
+    if (tData.length > 1 && properties.show_legend) {
+      defaultMargins.top += (tData.length - 1) * 20;
+    }
+
+    return defaultMargins;
   }
 
   // ----------------------------------------------------------------------------------------------------------------------------- //
