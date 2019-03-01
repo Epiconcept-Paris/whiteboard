@@ -543,7 +543,7 @@ function renderVisualData(visualsSel) {
           xAxis_format: ",.0f",
           yAxis_format: "",
           tooltip_format: ",.0f",
-          show_legend: true,
+          show_legend: d['legend'] !== undefined ? d['legend'] : false,
           show_labels: true,
           labels_format: true,
           title: d.title,
@@ -716,14 +716,14 @@ function renderVisual(currentVisual, x0, x1, y0, y1, posx, posy, width, height, 
     for (var i = 0; i < visuals.length; i++) {
       if (visuals[i].id == currentVisual.id) {
         visuals[i].update = true;
-        visuals[i].x0 = x0;
-        visuals[i].x1 = x1;
-        visuals[i].y0 = y0;
-        visuals[i].y1 = y1;
-        visuals[i].posx = posx;
-        visuals[i].posy = posy;
-        visuals[i].height = height;
-        visuals[i].width = width;
+        visuals[i].x0 = x0 !== undefined ? x0 : (currentVisual.x0 !== undefined ? currentVisual.x0 : 0);
+        visuals[i].x1 = x1 !== undefined ? x1 : (currentVisual.x1 !== undefined ? currentVisual.x1 : 0);
+        visuals[i].y0 = y0 !== undefined ? y0 : (currentVisual.y0 !== undefined ? currentVisual.y0 : 0);
+        visuals[i].y1 = y1 !== undefined ? y1 : (currentVisual.y1 !== undefined ? currentVisual.y1 : 0);
+        visuals[i].posx = posx !== undefined ? posx : (currentVisual.posx !== undefined ? currentVisual.posx : 0);
+        visuals[i].posy = posy !== undefined ? posy : (currentVisual.posy !== undefined ? currentVisual.posy : 0);
+        visuals[i].height = height !== undefined ? height : (currentVisual.height !== undefined ? currentVisual.height : 0);
+        visuals[i].width = width !== undefined ? width : (currentVisual.width !== undefined ? currentVisual.width : 0);
         visuals[i].title = title !== undefined ? title : (currentVisual.title !== undefined ? currentVisual.title : '');
         visuals[i].fields = fields;
       }
@@ -951,7 +951,6 @@ function showActionsAt(visualIndex) {
 function showOptionsAt(visualIndex) {
   currentVisualOptionIndex = visualIndex;
   if (!visuals[visualIndex].renderAs) {
-    // console.log('showing options on drop, then calling changeRender', visuals[visualIndex]);
     changeRender(visuals[visualIndex]);
   }
 
@@ -1039,7 +1038,7 @@ function showOptionsAt(visualIndex) {
         || d3.event.clientY <= box.y
         || d3.event.clientY >= box.y + box.height) {
         d.mouseover = false;
-        removeSelectedFields();
+        // removeSelectedFields();
       }
     })
   ;
@@ -1057,34 +1056,45 @@ function showOptionsAt(visualIndex) {
   allLines.select("div.value-input")
     .html(function (d) {
       if (d.type === 'string') {
-        return '<input type="text" class="text-title" value="' + visuals[currentVisualOptionIndex][d.id] + '"/>';
+        return '<input type="text" value="' + visuals[currentVisualOptionIndex][d.id] + '"/>';
+      }
+      if (d.type === 'boolean') {
+        return '<input type="checkbox"' + (visuals[currentVisualOptionIndex][d.id] ? ' checked ' : '') + '/>';
       }
     })
     .on("change", function (d, i, group) {
       // console.log(d, i, group);
       // console.log(group[i].querySelector('input').value, 'value');
       var visual = visuals[currentVisualOptionIndex];
-      // visual[d.id] = group[i].querySelector('input').value;
+      if (d.type === 'string') {
+        visual[d.id] = group[i].querySelector('input').value;
+      }
 
-      renderVisual(visual, visual.x0, visual.x1, visual.y0, visual.y1, visual.posx, visual.posy, visual.width, visual.height, group[i].querySelector('input').value);
+      if (d.type === 'boolean') {
+        visual[d.id] = group[i].querySelector('input').checked;
+      }
+
+      renderVisual(visual);
     });
 
   var news = vals.enter().append("div").classed("field-value", true)
     .on("mouseover", function (d, i, group) {
       if (!draggingField && d.type !== "empty") {
         var div = d3.select(group[i]).classed("focus", true);
-        if (div.selectAll("div.close-button").size() === 0)
+        if (div.selectAll("div.close-button").size() === 0) {
           div.insert("div", "div.function-choice").text("x").classed("close-button", true).on("click", function (d, i, group) {
             d.type = "selected";
             removingField = true;
             removeSelectedFields();
             removingField = false;
           });
-        if (div.selectAll("img.triangle-button").size() === 0)
+        }
+        if (div.selectAll("img.triangle-button").size() === 0) {
           div.insert("img", "div.function-choice").attr("src", "img/invertedTriangle.png").classed("triangle-button", true)
             .on("click", function (d, i, group) {
               renderFieldFunctions(d, group[i].parentNode.parentNode.__data__, group[i].parentNode.parentNode);
             })
+        }
       }
     })
     .on("mouseout", function (d, i, group) {
@@ -1293,6 +1303,8 @@ function removeSelectedFields() {
     }
   }
   if (changes) {
+    var visual = visuals[currentVisualOptionIndex];
+    renderVisual(visual);
     showOptionsAt(currentVisualOptionIndex);
   }
 }
