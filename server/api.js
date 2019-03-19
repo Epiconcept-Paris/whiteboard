@@ -69,7 +69,7 @@ exports.server = () => {
       console.log(`${login} is asking for adding a new workspace`);
       path = path.substring("/workspaces/".length);
       path = path.substring(0, path.length - "/addWks".length);
-      addWks.createWks(query.name,query.login,query.psw,query.url)
+      addWks.createWks(query.name, query.login, query.psw, query.url, query.chunk)
       .then(()=>{
         res.statusCode = 200;
         return res.end('{"status":"OK"}')
