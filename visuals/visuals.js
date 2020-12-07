@@ -381,19 +381,32 @@ vRender["Lines"].render = function(svg, data, properties) {
       var minX = d3.min(data, function(d) { return d[oCategoryField.name]; });
       var maxX = d3.max(data, function(d) { return d[oCategoryField.name]; });
       x.domain([minX, maxX]).nice();
-
+      // add x-axis
+      chart.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(calcTicksX(minX, maxX, width)));
       break;
 
     case 'date':
       x = d3.scaleTime().rangeRound([0, width]);
       x.domain(d3.extent(data, function(d) { return d[oCategoryField.name] }));
-
+      // add x-axis
+      chart.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
       break;
 
     default: // ordinal data [string, fkey_dico, ...]
       x = d3.scalePoint().range([0, width]);
       x.domain(data.map(function(d) { return d[oCategoryField.name]; }));
-
+      var tickCount = calcTicksX(0, data.length, width);
+      // add x-axis
+      chart.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).tickValues(x.domain().filter(function(d, i) { return !(i % Math.round(data.length / tickCount)); })));
       break;
   }
 
@@ -401,12 +414,6 @@ vRender["Lines"].render = function(svg, data, properties) {
   var line = d3.line()
     .x(function(d) { return x(d[oCategoryField.name]); })
     .y(function(d) { return y(d.measure); });
-
-  // add x-axis
-  chart.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
 
   // add x-axis label
   chart.append("text")
@@ -497,6 +504,21 @@ vRender["Lines"].render = function(svg, data, properties) {
       .attr("stroke-dashoffset", 0);
   }
 
+  function calcTicksX(minX, maxX, width) {
+    var lengthValMax = maxX.toString().length;
+    var lengthValMin = minX.toString().length;
+    var lengthMax;
+    if (lengthValMin <= lengthValMax){
+      lengthMax = lengthValMax + 1 ;
+    }
+    if (lengthValMin <= lengthValMax){
+      lengthMax = lengthValMin + 1 ;
+    }
+    var tickSize = 6 * lengthMax + 25 ;
+    var nbTicks = Math.floor(width / tickSize) ;
+    return nbTicks < 1 ? 1 : nbTicks ;
+  }
+
   function calcAttributes(width) {
 
     var defaultAttributes = {
@@ -525,7 +547,7 @@ vRender["Lines"].render = function(svg, data, properties) {
       top: 20,
       right: 20,
       bottom: 30,
-      left: 30
+      left: 40
     };
 
     if (properties.title) {

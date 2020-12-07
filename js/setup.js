@@ -53,6 +53,8 @@ function addWks() {
   form.append('input').attr('type', 'password').attr('name', 'psw').attr('id', 'wksPasswd');
   form.append('label').attr('for', 'url').text('Voozanoo4 URL');
   form.append('input').attr('type', 'url').attr('name', 'url').attr('id', 'wksUrl');
+  form.append('label').attr('for', 'chunk').text('Chunk size');
+  form.append('input').attr('type', 'number').attr('name', 'chunk').attr('id', 'wksChunk').attr('value', 5000);
   form.append('input').attr('type', "button").attr('id', 'addWks-form-submit').attr('value', 'Connect');
   form.append('input').attr('type', "button").attr('id', 'addWks-form-cancel').attr('value', 'Cancel');
 
@@ -62,9 +64,10 @@ function addWks() {
       , d3.select("#wksUser").property("value")
       , d3.select("#wksPasswd").property("value")
       , d3.select("#wksUrl").property("value")
+      , d3.select("#wksChunk").property("value")
       , d => {
         workspaceName = d3.select("#wksName").property("value");
-        d3.select('div.addWks-hidePage').remove()
+        d3.select('div.addWks-hidePage').remove();
         refresh();
       })
   });
@@ -282,7 +285,7 @@ function setupGrid() {
   d3.select("div.grid").selectAll("div").data(cells).enter()
     .append("div").attr("class", "cell")
     .on("mouseover", selectCell)
-    .on("mouseout", unselectCell)
+    .on("mouseout", unselectCell);
   d3.select("div.pane-resizer").call(paneDraggable);
 }
 
@@ -436,7 +439,7 @@ function boundaryCells(cells, index, width, height) {
   var i = 0;
   while (ind < cells.length && i < width * height) {
     if (i % width <= ind % nCols) //avoid shape overflow canvas
-      ret.push(cells[ind])
+      ret.push(cells[ind]);
     if (Math.floor(i / width) < Math.floor((i + 1) / width)) //jump to next line
       ind = ind + nCols - width + 1;
     else
@@ -651,9 +654,8 @@ function replaceSelectionByVisual(currentVisual) {
 
   var selected = d3.selectAll("div.selected-cell").classed("dropped-cell", true).nodes();
   if (selected.length > 0) {
-    var nCols = 0;
     var cells = d3.selectAll("div.cell").nodes();
-    for (nCols = 0; nCols < cells.length && (nCols + 1 == cells.length || cells[nCols + 1].getBoundingClientRect().left > cells[nCols].getBoundingClientRect().left); nCols++) ;
+    for (var nCols = 0; nCols < cells.length && (nCols + 1 === cells.length || cells[nCols + 1].getBoundingClientRect().left > cells[nCols].getBoundingClientRect().left); nCols++) ;
     nCols++;
 
     var x0 = -1, x1 = -1, y0 = -1, y1 = -1, posx, posy, minindex, maxindex;

@@ -333,7 +333,7 @@ div.cell {
 }
 
 div.selected-cell {
-  background-color: #444444;
+  background-color: #4BCDDB;
 }
 
 div.dropped-cell {
@@ -545,24 +545,26 @@ div.workspace-switch {
   background: #333333;
   z-index: 5000;
   position: fixed;
-  opacity: 0.3;
+  opacity: 0.8;
 }
 
 .addWks-div {
   z-index: 10000;
-  opacity: 1;
+  /*opacity: 1;*/
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
   margin: auto;
-  width: 20%;
-  height: 25%;
-  color: white;
+  width: 25%;
+  height: 300px;
+  /*color: white;*/
+  color: #000000;
+  background: #ffffff;
   text-align: center;
-  border: 1px #5cb85c
-
+  padding: 0 25px;
+  border: 5px #4BCDDB;
 }
 
 .addWks-form {
@@ -570,12 +572,12 @@ div.workspace-switch {
   flex-direction: column;
   justify-content: center;
   align-content: space-between;
-  opacity: 1;
+  /*opacity: 1;*/
+  height: auto;
 }
 
 #addWks-form-submit, #addWks-form-cancel {
-  margin: auto;
-  margin-top: 10px;
+  margin: 10px auto auto;
   width: 50%;
 }
 

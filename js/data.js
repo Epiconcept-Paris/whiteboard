@@ -81,15 +81,16 @@ var visualGallery = [
       {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
       {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
     ]
-  },
-  {
-    "name": "Sample", "icon": "icons/lines.png", "alt": "Sample",
-    "fields": [
-      {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
-      {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
-      {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
-    ]
   }
+  // ,
+  // {
+  //   "name": "Sample", "icon": "icons/lines.png", "alt": "Sample",
+  //   "fields": [
+  //     {"id": "title", "name": "Title", "type": "string", "arity": "1", "group": "data", "values": []},
+  //     {"id": "category", "name": "Category", "type": "axis", "arity": "*", "group": "data", "values": []},
+  //     {"id": "measure", "name": "Measure", "type": "measure", "arity": "*", "group": "data", "values": []}
+  //   ]
+  // }
 ];
 
 var measureFunctions = [

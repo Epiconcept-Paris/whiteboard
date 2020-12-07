@@ -1,6 +1,6 @@
 const storage = {
-  addWorkspace: function(ws, login, passwd, url, cb) {
-    this.jsonRequest(`/workspaces/${encodeURI(ws)}/addWks?name=${encodeURI(ws)}&login=${encodeURI(login)}&psw=${encodeURI(passwd)}&url=${encodeURI(url)}`, cb);
+  addWorkspace: function(ws, login, passwd, url, chunk, cb) {
+    this.jsonRequest(`/workspaces/${encodeURI(ws)}/addWks?name=${encodeURI(ws)}&login=${encodeURI(login)}&psw=${encodeURI(passwd)}&url=${encodeURI(url)}&chunk=${encodeURI(chunk)}`, cb);
   }
 
   ,getWorkspaces: function(cb) {
@@ -20,7 +20,7 @@ const storage = {
         if (request.readyState === XMLHttpRequest.DONE) {
           // everything is good, the response is received
           if (request.status === 200) {
-            console.log('refresh request completed')
+            console.log('refresh request completed');
             resolve();
           } else {
           }

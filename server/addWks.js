@@ -1,6 +1,6 @@
 const fs = require('fs');
 
- exports.createWks = function(name,login,psw,url) {
+ exports.createWks = function(name,login,psw,url,chunk) {
   return new Promise((resolveCreateWks) => {
 
     return new Promise((resolveCreateDir) => {
@@ -21,7 +21,7 @@ const fs = require('fs');
         login: login,
         psw: psw,
         url: url,
-        chunk: '500'
+        chunk: chunk || 5000
       }];
       const sDataSourcesJSON = JSON.stringify(aDataSource);
       fs.writeFile(path + '/datasources.json', sDataSourcesJSON, (err) => {
